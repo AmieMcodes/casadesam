@@ -1,0 +1,28 @@
+﻿[build]
+  publish = "."
+
+# Clean URLs for static HTML (optional but recommended)
+[[redirects]]
+  from = "/mission"
+  to = "/mission.html"
+  status = 200
+
+[[redirects]]
+  from = "/why-paraguay"
+  to = "/why-paraguay.html"
+  status = 200
+
+[[redirects]]
+  from = "/sustainability"
+  to = "/sustainability.html"
+  status = 200
+
+[[redirects]]
+  from = "/philosophy"
+  to = "/philosophy.html"
+  status = 200
+
+[[redirects]]
+  from = "/timeline"
+  to = "/timeline.html"
+  status = 200
