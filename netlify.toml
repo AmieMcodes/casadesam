@@ -1,4 +1,4 @@
-﻿[build]
+[build]
   publish = "."
 
 # Clean URLs for static HTML (optional but recommended)
