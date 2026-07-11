@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://casadesam.org/sitemap.xml

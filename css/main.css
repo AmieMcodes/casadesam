@@ -259,3 +259,241 @@ ul.sam-list li{
   color: var(--sam-mute);
   font-size: 0.95rem;
 }
+
+/* ==================================================
+   Blog
+   ================================================== */
+
+.blog-article{
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 64px 20px 88px;
+}
+
+.blog-header{
+  margin-bottom: 36px;
+}
+
+.blog-meta{
+  color: var(--sam-olive);
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.blog-subtitle{
+  color: var(--sam-mute);
+  font-size: 1.1rem;
+  max-width: 680px;
+}
+
+.blog-feature-image{
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 32px 0 40px;
+  border-radius: 18px;
+  border: 1px solid var(--sam-line);
+}
+
+.blog-article h2{
+  margin-top: 48px;
+  margin-bottom: 16px;
+}
+
+.blog-article h3{
+  margin-top: 32px;
+  margin-bottom: 12px;
+}
+
+.blog-article ul{
+  padding-left: 22px;
+  margin: 0 0 1.5em;
+}
+
+.blog-article li{
+  margin-bottom: 10px;
+}
+
+.blog-article blockquote{
+  margin: 32px 0;
+  padding: 20px 24px;
+  border-left: 4px solid var(--sam-earth);
+  background: rgba(200,100,59,0.06);
+  border-radius: 12px;
+  font-size: 1.05rem;
+}
+
+.blog-keep-reading{
+  margin-top: 52px;
+  padding-top: 28px;
+  border-top: 1px solid var(--sam-line);
+}
+
+.blog-keep-reading ul{
+  margin-bottom: 0;
+}
+
+/* ---------- Reusable CTA Slots ---------- */
+
+.blog-cta{
+  margin: 44px 0;
+  padding: 28px;
+  border-radius: 18px;
+  border: 1px solid var(--sam-line);
+}
+
+.blog-cta-top{
+  background: rgba(127,183,126,0.10);
+  border-left: 5px solid var(--sam-leaf);
+}
+
+.blog-cta-bottom{
+  background: rgba(242,201,76,0.12);
+  border-left: 5px solid var(--sam-maize);
+}
+
+.blog-cta-label{
+  margin-bottom: 8px;
+  color: var(--sam-olive);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.blog-cta-title{
+  margin: 0 0 12px;
+}
+
+.blog-cta-copy{
+  margin-bottom: 20px;
+}
+
+.blog-cta-button{
+  display: inline-block;
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: var(--sam-earth);
+  color: white;
+  text-decoration: none;
+  font-weight: 650;
+}
+
+.blog-cta-button:hover{
+  filter: brightness(0.94);
+}
+
+/* ---------- Blog Index ---------- */
+
+.blog-index{
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 64px 20px 88px;
+}
+
+.blog-list{
+  display: grid;
+  gap: 22px;
+  margin-top: 32px;
+}
+
+.blog-card{
+  padding: 24px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid var(--sam-line);
+  border-radius: 18px;
+}
+
+.blog-card h2{
+  margin: 6px 0 10px;
+}
+
+.blog-card h2 a{
+  text-decoration: none;
+}
+
+.blog-card p:last-child{
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px){
+  .blog-article,
+  .blog-index{
+    padding-top: 44px;
+  }
+
+  .blog-cta{
+    padding: 22px;
+  }
+}
+
+/* Blog landing-page thumbnails */
+
+.blog-index {
+  width: min(1120px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.blog-list {
+  display: grid;
+  gap: 2rem;
+}
+
+.blog-card {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.blog-card > a:first-child {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #eee8df;
+}
+
+.blog-card > a:first-child img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.blog-card-content {
+  min-width: 0;
+}
+
+@media (min-width: 800px) {
+  .blog-card {
+    display: grid;
+    grid-template-columns: minmax(260px, 38%) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .blog-card > a:first-child {
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .blog-card > a:first-child img {
+    min-height: 100%;
+    max-height: none;
+  }
+}
+
+@media (max-width: 799px) {
+  .blog-index {
+    width: min(100% - 28px, 720px);
+  }
+
+  .blog-card > a:first-child {
+    aspect-ratio: 16 / 10;
+  }
+
+  .blog-card > a:first-child img {
+    max-height: 230px;
+  }
+}
