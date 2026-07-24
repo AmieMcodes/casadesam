@@ -39,7 +39,7 @@
 
   <url>
     <loc>https://casadesam.org/blog.html</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <priority>0.9</priority>
   </url>
 
@@ -78,5 +78,22 @@
     <lastmod>2026-07-10</lastmod>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://casadesam.org/blog/housing-options-for-adults-with-autism-and-intellectual-disabilities.html</loc>
+    <lastmod>2026-07-24</lastmod>
+    <priority>0.8</priority>
+  </url>
 
+  <url>
+    <loc>https://casadesam.org/blog/what-is-supported-living-for-autistic-adults.html</loc>
+    <lastmod>2026-07-24</lastmod>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://casadesam.org/blog/independent-living-supported-living-and-residential-care.html</loc>
+    <lastmod>2026-07-24</lastmod>
+    <priority>0.8</priority>
+  </url>
 </urlset>
+
