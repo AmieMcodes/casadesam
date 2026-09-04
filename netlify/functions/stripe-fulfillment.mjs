@@ -62,12 +62,20 @@ async function apiRequest(apiKey, path, { method = "GET", body, headers = {}, al
 
   const text = await response.text();
   let data = null;
-  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
 
   if (allow404 && response.status === 404) return null;
   if (allow409 && response.status === 409) return data;
   if (!response.ok) {
-    throw new Error(`Resend ${method} ${path} failed (${response.status}): ${typeof data === "string" ? data : JSON.stringify(data)}`);
+    throw new Error(
+      `Resend ${method} ${path} failed (${response.status}): ${
+        typeof data === "string" ? data : JSON.stringify(data)
+      }`,
+    );
   }
   return data;
 }
@@ -150,6 +158,7 @@ async function syncRoiContact(email, sessionCreated) {
   const properties = {};
   if (!existing.properties?.source) properties.source = "roi_workbook";
   if (!existing.properties?.customer_since) properties.customer_since = purchaseDate;
+
   if (Object.keys(properties).length > 0) {
     await apiRequest(contactsKey, `/contacts/${emailPath}`, {
       method: "PATCH",
@@ -166,19 +175,26 @@ async function syncRoiContact(email, sessionCreated) {
 async function fulfillRoi(session, stripeEventId, webhookSecret) {
   const expectedPaymentLink = process.env.STRIPE_ROI_PAYMENT_LINK_ID;
   if (!expectedPaymentLink) throw new Error("STRIPE_ROI_PAYMENT_LINK_ID is not configured");
+
   if (session.payment_link !== expectedPaymentLink) {
     console.log("Ignoring Checkout Session from another Payment Link", session.payment_link);
     return;
   }
 
   if (session.payment_status && !["paid", "no_payment_required"].includes(session.payment_status)) {
-    console.log("Checkout Session is not paid yet; waiting for async payment success", session.id, session.payment_status);
+    console.log(
+      "Checkout Session is not paid yet; waiting for async payment success",
+      session.id,
+      session.payment_status,
+    );
     return;
   }
 
   const email = session.customer_details?.email || session.customer_email;
   if (!email) throw new Error(`No customer email found on Checkout Session ${session.id}`);
 
+  // This function intentionally uses Netlify Functions v2 syntax so the
+  // Netlify Blobs environment is injected automatically at runtime.
   const store = getStore("digital-products");
   const pdf = await store.get("roi-of-independence.pdf", { type: "arrayBuffer" });
   if (!pdf) throw new Error("ROI workbook is not present in Netlify Blobs");
@@ -195,29 +211,26 @@ async function fulfillRoi(session, stripeEventId, webhookSecret) {
   console.log("ROI fulfillment completed", stripeEventId, session.id, email);
 }
 
-export const handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
+export default async (req) => {
+  if (req.method !== "POST") {
+    return new Response("Method Not Allowed", {
+      status: 405,
       headers: { Allow: "POST" },
-      body: "Method Not Allowed",
-    };
+    });
   }
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
     console.error("STRIPE_WEBHOOK_SECRET is not configured.");
-    return { statusCode: 503, body: "Webhook not configured" };
+    return new Response("Webhook not configured", { status: 503 });
   }
 
-  const payload = event.isBase64Encoded
-    ? Buffer.from(event.body || "", "base64").toString("utf8")
-    : (event.body || "");
-  const signature = event.headers["stripe-signature"] || event.headers["Stripe-Signature"];
+  const payload = await req.text();
+  const signature = req.headers.get("stripe-signature");
 
   if (!verifyStripeSignature(payload, signature, webhookSecret)) {
     console.error("Invalid or expired Stripe webhook signature.");
-    return { statusCode: 400, body: "Invalid signature" };
+    return new Response("Invalid signature", { status: 400 });
   }
 
   let stripeEvent;
@@ -225,7 +238,7 @@ export const handler = async (event) => {
     stripeEvent = JSON.parse(payload);
   } catch (error) {
     console.error("Unable to parse Stripe webhook payload.", error);
-    return { statusCode: 400, body: "Invalid JSON" };
+    return new Response("Invalid JSON", { status: 400 });
   }
 
   const supportedEvents = new Set([
@@ -234,14 +247,14 @@ export const handler = async (event) => {
   ]);
 
   if (!supportedEvents.has(stripeEvent.type)) {
-    return { statusCode: 200, body: "ignored" };
+    return new Response("ignored", { status: 200 });
   }
 
   try {
     await fulfillRoi(stripeEvent.data?.object || {}, stripeEvent.id, webhookSecret);
-    return { statusCode: 200, body: "ok" };
+    return new Response("ok", { status: 200 });
   } catch (error) {
     console.error("Casa de SAM fulfillment failed", stripeEvent.id, error);
-    return { statusCode: 500, body: "Fulfillment failed" };
+    return new Response("Fulfillment failed", { status: 500 });
   }
 };
