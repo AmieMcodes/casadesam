@@ -84,13 +84,18 @@ export const handler = async (event) => {
     if (payload.action === "quarterly") {
       const topicId = process.env.RESEND_QUARTERLY_TOPIC_ID;
       if (!topicId) throw new Error("RESEND_QUARTERLY_TOPIC_ID is not configured");
+
+      // Resend's raw REST endpoint expects the request body itself to be
+      // an array of topic subscription updates (not { topics: [...] }).
+      await resendRequest(`/contacts/${emailPath}/topics`, "PATCH", [
+        { id: topicId, subscription: "opt_in" },
+      ]);
+
       await resendRequest(`/contacts/${emailPath}`, "PATCH", {
         unsubscribed: false,
         properties: { quarterly_opt_in_date: today },
       });
-      await resendRequest(`/contacts/${emailPath}/topics`, "PATCH", {
-        topics: [{ id: topicId, subscription: "opt_in" }],
-      });
+
       return {
         statusCode: 200,
         headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
