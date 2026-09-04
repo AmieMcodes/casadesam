@@ -50,6 +50,7 @@ function createActionToken(email, action, secret) {
 async function apiRequest(apiKey, path, { method = "GET", body, headers = {}, allow404 = false, allow409 = false } = {}) {
   if (!apiKey) throw new Error(`Missing API key for ${path}`);
 
+  console.log("Resend request", method, path);
   const response = await fetch(`https://api.resend.com${path}`, {
     method,
     headers: {
@@ -68,6 +69,8 @@ async function apiRequest(apiKey, path, { method = "GET", body, headers = {}, al
     data = text;
   }
 
+  console.log("Resend response", method, path, response.status);
+
   if (allow404 && response.status === 404) return null;
   if (allow409 && response.status === 409) return data;
   if (!response.ok) {
@@ -82,6 +85,8 @@ async function apiRequest(apiKey, path, { method = "GET", body, headers = {}, al
 
 async function sendRoiDeliveryEmail({ email, stripeSessionId, pdfBase64, webhookSecret }) {
   const sendingKey = process.env.RESEND_API_KEY;
+  if (!sendingKey) throw new Error("RESEND_API_KEY is not configured");
+
   const quarterlyToken = createActionToken(email, "quarterly", webhookSecret);
   const boardToken = createActionToken(email, "board", webhookSecret);
   const quarterlyUrl = `${CONTACT_ACTION_URL}?token=${encodeURIComponent(quarterlyToken)}`;
@@ -131,6 +136,7 @@ async function sendRoiDeliveryEmail({ email, stripeSessionId, pdfBase64, webhook
 async function syncRoiContact(email, sessionCreated) {
   const contactsKey = process.env.RESEND_CONTACTS_API_KEY;
   const roiSegmentId = process.env.RESEND_ROI_SEGMENT_ID;
+  if (!contactsKey) throw new Error("RESEND_CONTACTS_API_KEY is not configured");
   if (!roiSegmentId) throw new Error("RESEND_ROI_SEGMENT_ID is not configured");
 
   const emailPath = encodeURIComponent(email);
@@ -173,6 +179,8 @@ async function syncRoiContact(email, sessionCreated) {
 }
 
 async function fulfillRoi(session, stripeEventId, webhookSecret) {
+  console.log("Fulfillment stage: start", stripeEventId, session.id);
+
   const expectedPaymentLink = process.env.STRIPE_ROI_PAYMENT_LINK_ID;
   if (!expectedPaymentLink) throw new Error("STRIPE_ROI_PAYMENT_LINK_ID is not configured");
 
@@ -180,6 +188,8 @@ async function fulfillRoi(session, stripeEventId, webhookSecret) {
     console.log("Ignoring Checkout Session from another Payment Link", session.payment_link);
     return;
   }
+
+  console.log("Fulfillment stage: payment link matched");
 
   if (session.payment_status && !["paid", "no_payment_required"].includes(session.payment_status)) {
     console.log(
@@ -190,28 +200,43 @@ async function fulfillRoi(session, stripeEventId, webhookSecret) {
     return;
   }
 
+  console.log("Fulfillment stage: payment confirmed", session.payment_status);
+
   const email = session.customer_details?.email || session.customer_email;
   if (!email) throw new Error(`No customer email found on Checkout Session ${session.id}`);
 
-  // This function intentionally uses Netlify Functions v2 syntax so the
-  // Netlify Blobs environment is injected automatically at runtime.
+  console.log("Fulfillment stage: buyer email found");
+  console.log("Fulfillment stage: opening blob store");
+
   const store = getStore("digital-products");
-  const pdf = await store.get("roi-of-independence.pdf", { type: "arrayBuffer" });
+  console.log("Fulfillment stage: reading ROI blob");
+  const pdf = await store.get("roi-of-independence.pdf", {
+    type: "arrayBuffer",
+    consistency: "strong",
+  });
   if (!pdf) throw new Error("ROI workbook is not present in Netlify Blobs");
+
+  console.log("Fulfillment stage: ROI blob loaded", pdf.byteLength);
   const pdfBase64 = Buffer.from(pdf).toString("base64");
 
+  console.log("Fulfillment stage: sending delivery email");
   await sendRoiDeliveryEmail({
     email,
     stripeSessionId: session.id || stripeEventId,
     pdfBase64,
     webhookSecret,
   });
+  console.log("Fulfillment stage: delivery email accepted by Resend");
 
+  console.log("Fulfillment stage: syncing Resend contact");
   await syncRoiContact(email, session.created);
-  console.log("ROI fulfillment completed", stripeEventId, session.id, email);
+  console.log("Fulfillment stage: contact sync complete");
+  console.log("ROI fulfillment completed", stripeEventId, session.id);
 }
 
-export default async (req) => {
+export default async (req, context) => {
+  console.log("Stripe fulfillment invocation received", context?.requestId || "no-request-id");
+
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", {
       status: 405,
@@ -240,6 +265,8 @@ export default async (req) => {
     console.error("Unable to parse Stripe webhook payload.", error);
     return new Response("Invalid JSON", { status: 400 });
   }
+
+  console.log("Stripe event verified", stripeEvent.id, stripeEvent.type);
 
   const supportedEvents = new Set([
     "checkout.session.completed",
