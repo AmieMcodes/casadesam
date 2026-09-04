@@ -26,3 +26,13 @@
   from = "/timeline"
   to = "/timeline.html"
   status = 200
+
+[[redirects]]
+  from = "/current"
+  to = "/current.html"
+  status = 200
+
+[[redirects]]
+  from = "/roi-of-independence"
+  to = "/roi-of-independence.html"
+  status = 200

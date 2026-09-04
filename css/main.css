@@ -497,3 +497,123 @@ ul.sam-list li{
     max-height: 230px;
   }
 }
+
+/* ==================================================
+   Current Update
+   ================================================== */
+
+.current-page{
+  width: min(100% - 40px, 1040px);
+  margin: 0 auto;
+  padding: 72px 0 96px;
+}
+
+.current-hero{
+  max-width: 780px;
+  margin-bottom: 48px;
+}
+
+.current-hero h1{
+  margin: 0 0 20px;
+  font-size: clamp(2.35rem, 7vw, 4.7rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.current-intro{
+  max-width: 720px;
+  color: var(--sam-ink);
+  font-size: 1.16rem;
+}
+
+.current-stamp,
+.current-label{
+  color: var(--sam-olive);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.current-status{
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.4fr);
+  gap: 36px;
+  margin: 0 0 28px;
+  padding: 30px 32px;
+  border: 1px solid rgba(79,111,82,0.28);
+  border-radius: 26px 17px 24px 19px;
+  background: rgba(127,183,126,0.10);
+}
+
+.current-status h2,
+.current-card h2{
+  margin: 4px 0 12px;
+}
+
+.current-status p:last-child,
+.current-card p:last-child{
+  margin-bottom: 0;
+}
+
+.current-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.current-card{
+  min-width: 0;
+  padding: 30px;
+  border: 1px solid var(--sam-line);
+  border-radius: 25px 16px 23px 18px;
+  background: rgba(255,255,255,0.62);
+}
+
+.current-card:nth-child(even){
+  border-radius: 17px 25px 18px 23px;
+}
+
+.current-card-leaf{ border-top: 5px solid var(--sam-leaf); }
+.current-card-earth{ border-top: 5px solid var(--sam-earth); }
+.current-card-maize{ border-top: 5px solid var(--sam-maize); }
+.current-card-olive{ border-top: 5px solid var(--sam-olive); }
+
+.current-link{
+  display: inline-block;
+  margin-top: 4px;
+  padding: 11px 17px;
+  border: 1px solid rgba(200,100,59,0.38);
+  border-radius: 14px 19px 15px 18px;
+  background: rgba(200,100,59,0.07);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.product-purchase{
+  margin: 36px 0 26px;
+}
+
+.product-format{
+  margin-bottom: 6px;
+  color: var(--sam-olive);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.product-billing-note{
+  margin-top: 18px;
+  color: var(--sam-mute);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 720px){
+  .current-page{ padding-top: 48px; }
+  .current-status,
+  .current-grid{ grid-template-columns: 1fr; }
+  .current-status{ gap: 8px; }
+  .current-card,
+  .current-status{ padding: 24px; }
+}
