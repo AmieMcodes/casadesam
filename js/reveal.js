@@ -1,11 +1,26 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const pathname = window.location.pathname;
+  const articleImage = document.querySelector(".blog-feature-image");
+
+  if (articleImage) {
+    if (pathname.includes("life-skills-for-autistic-adults-with-significant-support-needs")) {
+      articleImage.src = "../assets/blog/september-4-2026/life-skills-for-autistic-adults-with-significant-support-needs/hero-v2.webp";
+    } else if (pathname.includes("how-daily-routines-create-safety-without-becoming-restrictive")) {
+      articleImage.src = "../assets/blog/september-4-2026/how-daily-routines-create-safety-without-becoming-restrictive/hero-v2.webp";
+    } else if (pathname.includes("supporting-choice-without-complete-independence")) {
+      articleImage.src = "../assets/blog/september-4-2026/supporting-choice-without-complete-independence/hero-v2.webp";
+      articleImage.style.maxWidth = "520px";
+      articleImage.style.margin = "32px auto 16px";
+    }
+  }
+
   const blogList = document.querySelector(".blog-index .blog-list");
 
   if (blogList && !blogList.querySelector('a[href="blog/life-skills-for-autistic-adults-with-significant-support-needs.html"]')) {
     const sept4Posts = `
       <article class="blog-card reveal">
         <a href="blog/life-skills-for-autistic-adults-with-significant-support-needs.html" aria-label="Read Life Skills for Autistic Adults With Significant Support Needs">
-          <img src="assets/blog/september-4-2026/life-skills-for-autistic-adults-with-significant-support-needs/hero.jpg" alt="Young Sam smiling while receiving a haircut in a child-friendly salon in Colorado Springs, Colorado.">
+          <img src="assets/blog/september-4-2026/life-skills-for-autistic-adults-with-significant-support-needs/hero-v2.webp" alt="Young Sam smiling while receiving a haircut in a child-friendly salon in Colorado Springs, Colorado.">
         </a>
         <div class="blog-card-content">
           <p class="blog-meta">Adult Services &amp; Daily Life · September 4, 2026</p>
@@ -17,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       <article class="blog-card reveal">
         <a href="blog/how-daily-routines-create-safety-without-becoming-restrictive.html" aria-label="Read How Daily Routines Can Create Safety Without Becoming Restrictive">
-          <img src="assets/blog/september-4-2026/how-daily-routines-create-safety-without-becoming-restrictive/hero.jpg" alt="Sam waiting against the wall on a Santiago Metro platform in Chile.">
+          <img src="assets/blog/september-4-2026/how-daily-routines-create-safety-without-becoming-restrictive/hero-v2.webp" alt="Sam waiting against the wall on a Santiago Metro platform in Chile.">
         </a>
         <div class="blog-card-content">
           <p class="blog-meta">Daily Life &amp; Safety · September 4, 2026</p>
@@ -29,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       <article class="blog-card reveal">
         <a href="blog/supporting-choice-without-complete-independence.html" aria-label="Read Supporting Choice When an Adult Cannot Live Completely Independently">
-          <img src="assets/blog/september-4-2026/supporting-choice-without-complete-independence/hero.jpg" alt="Sam carrying a toy he selected while riding an escalator in a shopping mall in Santiago, Chile.">
+          <img src="assets/blog/september-4-2026/supporting-choice-without-complete-independence/thumb-v2.webp" alt="Sam carrying a toy he selected while riding an escalator in a shopping mall in Santiago, Chile.">
         </a>
         <div class="blog-card-content">
           <p class="blog-meta">Choice, Dignity &amp; Lifelong Support · September 4, 2026</p>
@@ -54,9 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     },
-    {
-      threshold: 0.15
-    }
+    { threshold: 0.15 }
   );
 
   reveals.forEach(el => observer.observe(el));
