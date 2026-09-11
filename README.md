@@ -90,20 +90,18 @@ There are no frameworks, build tools, or dependencies.
 
 Gustavo is Casa de SAM's bilingual guide. His public mode answers from the
 project's approved working knowledge, distinguishes current reality from future
-plans, and offers a low-pressure inquiry handoff. His private mode supports
-role, onboarding, and nonprofit-formation decision work behind a separate
-access code.
+plans, protects Sam and future residents, and offers a low-pressure inquiry
+handoff only when a visitor asks or a conversation naturally reaches that point.
 
-The public chat does not save conversation transcripts. Netlify Forms receives
-only information a visitor deliberately submits through the inquiry form.
+The browser keeps only the current conversation history. Netlify Forms receives
+contact information a visitor deliberately submits and includes the conversation
+only when the visitor explicitly consents.
 
 Runtime configuration:
 
 - Netlify AI Gateway must be enabled for the site.
-- Private access is verified server-side against a one-way token digest; the
-  access code itself is never committed to the repository.
-- The private workspace is available at `/gustavo-private` and must not be
-  linked from public navigation.
+- Gustavo is currently a public conversational guide. Private workspace
+  functionality is deferred.
 
 ### Why a static site?
 
