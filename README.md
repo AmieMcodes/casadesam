@@ -86,6 +86,24 @@ This site is built using:
 
 There are no frameworks, build tools, or dependencies.
 
+### Gustavo
+
+Gustavo is Casa de SAM's bilingual guide. His public mode answers from the
+project's approved working knowledge, distinguishes current reality from future
+plans, and offers a low-pressure inquiry handoff. His private mode supports
+role, onboarding, and nonprofit-formation decision work behind a separate
+access code.
+
+The public chat does not save conversation transcripts. Netlify Forms receives
+only information a visitor deliberately submits through the inquiry form.
+
+Runtime configuration:
+
+- Netlify AI Gateway must be enabled for the site.
+- `GUSTAVO_ADMIN_TOKEN` must be set as a secret runtime environment variable.
+- The private workspace is available at `/gustavo-private` and must not be
+  linked from public navigation.
+
 ### Why a static site?
 
 - Longevity over novelty  
