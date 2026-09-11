@@ -1,7 +1,15 @@
 [build]
   publish = "."
 
+[functions]
+  node_bundler = "esbuild"
+
 # Clean URLs for static HTML (optional but recommended)
+[[redirects]]
+  from = "/gustavo-private"
+  to = "/gustavo-admin.html"
+  status = 200
+
 [[redirects]]
   from = "/mission"
   to = "/mission.html"
