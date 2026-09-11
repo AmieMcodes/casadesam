@@ -119,6 +119,7 @@ p{ margin: 0 0 1.25em; }
 .gustavo-launch{display:flex;align-items:center;gap:9px;border:1px solid rgba(79,111,82,.28);border-radius:999px;padding:10px 16px 10px 10px;background:var(--sam-olive);color:#fff;box-shadow:0 8px 24px rgba(31,35,40,.14);cursor:pointer}
 .gustavo-launch span:first-child{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.16);font-family:Georgia,serif;font-size:1.1rem}
 .gustavo-panel{position:absolute;right:0;bottom:60px;display:flex;flex-direction:column;width:min(410px,calc(100vw - 24px));height:min(680px,calc(100dvh - 100px));overflow:hidden;background:var(--sam-paper);border:1px solid var(--sam-line);border-radius:18px;box-shadow:0 18px 48px rgba(31,35,40,.18)}
+.gustavo-panel[hidden]{display:none}
 .gustavo-header{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--sam-paper);border-bottom:1px solid var(--sam-line);border-radius:18px 18px 0 0}
 .gustavo-header strong{display:block;color:var(--sam-earth);font-family:Georgia,serif;font-size:1.15rem}.gustavo-header small{display:block;color:var(--sam-mute)}
 .gustavo-close{border:0;background:transparent;color:var(--sam-mute);font-size:1.7rem;line-height:1;cursor:pointer}
