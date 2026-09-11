@@ -100,7 +100,8 @@ only information a visitor deliberately submits through the inquiry form.
 Runtime configuration:
 
 - Netlify AI Gateway must be enabled for the site.
-- `GUSTAVO_ADMIN_TOKEN` must be set as a secret runtime environment variable.
+- Private access is verified server-side against a one-way token digest; the
+  access code itself is never committed to the repository.
 - The private workspace is available at `/gustavo-private` and must not be
   linked from public navigation.
 

@@ -3,6 +3,7 @@ import { CASA_KNOWLEDGE, PRIVATE_INSTRUCTIONS, PUBLIC_INSTRUCTIONS } from "./_sh
 const MODEL = "gpt-5.4-mini";
 const MAX_MESSAGE_LENGTH = 2400;
 const MAX_HISTORY = 8;
+const ADMIN_TOKEN_DIGEST = "6ae26ac72b349eea21ba2abcbd4acb15807d6b16f20b15b24e367a556ebe01dc";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -23,13 +24,16 @@ function safeHistory(history) {
     .map((item) => ({ role: item.role, content: item.content.slice(0, MAX_MESSAGE_LENGTH) }));
 }
 
-function validAdminToken(req) {
-  const expected = Netlify.env.get("GUSTAVO_ADMIN_TOKEN");
-  if (!expected) return false;
+async function validAdminToken(req) {
   const supplied = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || "";
-  if (supplied.length !== expected.length) return false;
+  if (!supplied) return false;
+  const digestBytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(supplied));
+  const suppliedDigest = Array.from(new Uint8Array(digestBytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  if (suppliedDigest.length !== ADMIN_TOKEN_DIGEST.length) return false;
   let difference = 0;
-  for (let i = 0; i < expected.length; i += 1) difference |= supplied.charCodeAt(i) ^ expected.charCodeAt(i);
+  for (let i = 0; i < ADMIN_TOKEN_DIGEST.length; i += 1) {
+    difference |= suppliedDigest.charCodeAt(i) ^ ADMIN_TOKEN_DIGEST.charCodeAt(i);
+  }
   return difference === 0;
 }
 
@@ -43,7 +47,7 @@ export default async (req) => {
     if (!message || message.length > MAX_MESSAGE_LENGTH) {
       return json({ error: `Please send a message between 1 and ${MAX_MESSAGE_LENGTH} characters.` }, 400);
     }
-    if (mode === "private" && !validAdminToken(req)) {
+    if (mode === "private" && !(await validAdminToken(req))) {
       return json({ error: "That private access code was not accepted." }, 401);
     }
 
