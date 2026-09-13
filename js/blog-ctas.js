@@ -44,3 +44,10 @@ document.querySelectorAll("[data-blog-cta]").forEach((slot) => {
     slot.innerHTML = blogCtas[type];
   }
 });
+
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-open-gustavo]");
+  if (!button) return;
+
+  document.querySelector(".gustavo-launch")?.click();
+});
