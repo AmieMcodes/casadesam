@@ -12,8 +12,18 @@ top: `
     <a
       class="blog-cta-button"
       href="https://casadesam.org/casa-de-sam-vision.pdf"
+      lang="en"
+      hreflang="en"
     >
-      Read Our Full Vision
+      Read Our Full Vision in English (PDF)
+    </a>
+    <a
+      class="blog-cta-button"
+      href="https://casadesam.org/casa-de-sam-vision-es.pdf"
+      lang="es"
+      hreflang="es"
+    >
+      Leé nuestra visión completa en español (PDF)
     </a>
   </section>
 `,
