@@ -39,7 +39,7 @@
 
   <url>
     <loc>https://casadesam.org/blog.html</loc>
-    <lastmod>2026-10-16</lastmod>
+    <lastmod>2026-10-23</lastmod>
     <priority>0.9</priority>
   </url>
 
@@ -263,4 +263,7 @@
     <lastmod>2026-10-16</lastmod>
     <priority>0.8</priority>
   </url>
+  <url><loc>https://casadesam.org/blog/what-happens-to-disabled-adults-without-family-caregivers.html</loc><lastmod>2026-10-23</lastmod><priority>0.7</priority></url>
+  <url><loc>https://casadesam.org/blog/why-siblings-should-not-be-the-entire-care-plan.html</loc><lastmod>2026-10-23</lastmod><priority>0.7</priority></url>
+  <url><loc>https://casadesam.org/blog/building-a-circle-of-support-that-can-outlive-a-parent.html</loc><lastmod>2026-10-23</lastmod><priority>0.7</priority></url>
 </urlset>
