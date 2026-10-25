@@ -48,10 +48,38 @@
   const inquiryToggle = root.querySelector(".gustavo-inquiry-toggle");
   const inquiry = root.querySelector(".gustavo-inquiry");
 
+  // Android keyboards shrink and sometimes pan the visual viewport without
+  // changing the layout viewport used by fixed-position elements.
+  const mobileChat = window.matchMedia("(max-width: 520px)");
+  function fitPanelToVisibleViewport() {
+    const viewport = window.visualViewport;
+    if (!mobileChat.matches || !viewport) {
+      for (const property of ["top", "left", "right", "bottom", "width", "height"]) {
+        panel.style.removeProperty(property);
+      }
+      return;
+    }
+    const gutter = 8;
+    panel.style.top = `${Math.round(viewport.offsetTop + gutter)}px`;
+    panel.style.left = `${Math.round(viewport.offsetLeft + gutter)}px`;
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+    panel.style.width = `${Math.max(0, Math.floor(viewport.width - gutter * 2))}px`;
+    panel.style.height = `${Math.max(0, Math.floor(viewport.height - gutter * 2))}px`;
+  }
+  window.visualViewport?.addEventListener("resize", fitPanelToVisibleViewport);
+  window.visualViewport?.addEventListener("scroll", fitPanelToVisibleViewport);
+  window.addEventListener("resize", fitPanelToVisibleViewport);
+  input.addEventListener("focus", () => requestAnimationFrame(fitPanelToVisibleViewport));
+
   function toggle(open) {
     panel.hidden = !open;
     launch.setAttribute("aria-expanded", String(open));
-    if (open) input.focus();
+    if (open) {
+      fitPanelToVisibleViewport();
+      // Let mobile visitors read Gustavo's welcome before opening the keyboard.
+      if (!mobileChat.matches) input.focus();
+    }
   }
   launch.addEventListener("click", () => toggle(panel.hidden));
   close.addEventListener("click", () => toggle(false));

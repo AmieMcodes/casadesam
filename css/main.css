@@ -138,7 +138,7 @@ p{ margin: 0 0 1.25em; }
 .gustavo-inquiry label{display:grid;gap:4px;color:var(--sam-olive);font-size:.9rem}.gustavo-hidden{display:none}.gustavo-form-status{margin:0;color:var(--sam-olive)}
 .gustavo-consent{grid-template-columns:auto 1fr!important;align-items:start;gap:8px!important}.gustavo-consent input{width:auto;margin-top:3px}
 .gustavo-note{flex:0 0 auto;margin:0;padding:0 16px 14px;color:var(--sam-mute);font-size:.78rem;line-height:1.35}
-@media(max-width:520px){.gustavo{right:10px;bottom:10px}.gustavo-launch span:last-child{display:none}.gustavo-launch{padding:8px}.gustavo-panel{position:fixed;inset:8px;width:auto;height:auto;max-height:none;border-radius:14px}.gustavo-header{padding:13px 15px}.gustavo-messages{padding:13px}.gustavo-chat-form{grid-template-columns:1fr auto;padding:10px 12px}.gustavo-chat-form textarea{min-height:44px;max-height:110px}.gustavo-note{padding:0 12px 10px}}
+@media(max-width:520px){.gustavo{right:10px;bottom:10px}.gustavo-launch span:last-child{display:none}.gustavo-launch{padding:8px}.gustavo-panel{position:fixed;inset:8px 8px auto;width:auto;height:calc(100dvh - 16px);min-height:0;max-height:none;border-radius:14px}.gustavo-header{padding:13px 15px}.gustavo-messages{padding:13px;overflow-y:scroll;touch-action:pan-y;-webkit-overflow-scrolling:touch}.gustavo-chat-form{grid-template-columns:1fr auto;padding:10px 12px}.gustavo-chat-form textarea{min-height:44px;max-height:110px}.gustavo-note{padding:0 12px 10px}}
 
 /* ==================================================
    Timeline Components
