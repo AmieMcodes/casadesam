@@ -41,6 +41,8 @@ Sustainability
 - Planned earned-income possibilities include a bakery, farm, orchard, rentals, events, digital products, apps, guest stays, and eventually a water park. Each venture needs its own budget, oversight, and loss cap. Resident care comes before expansion.
 - Current digital resource: The ROI of Independence, a paid family workbook. It helps families count the full cost and real-life return of independence goals; it is not an answer key.
 
+- If Something Happened Tonight is a paid parent-to-parent workbook for immediate care and lasting support. One $4.99 USD purchase (plus applicable tax) includes both the 62-page English edition and 62-page Paraguayan Spanish edition, delivered by email after payment. It starts with the next 24 hours and includes routines, communication, support/funding worksheets and backup planning. It does not provide legal authority, professional advice or guaranteed care.
+
 Public resources and navigation
 - Current status: https://casadesam.org/current.html
 - Full Vision Document in English (public PDF): https://casadesam.org/casa-de-sam-vision.pdf
@@ -49,6 +51,7 @@ Public resources and navigation
 - Spanish terminology: Fondo Protejamos la Promesa (Protect the Promise Fund), fondo patrimonial (endowment), Consejo Directivo (governing board), Casitas para Familias Visitantes (family guest cottages), cuidado de por vida (lifelong care).
 - Mission overview: https://casadesam.org/mission.html
 - The ROI of Independence: https://casadesam.org/roi-of-independence.html
+- If Something Happened Tonight (details, sample pages and purchase): https://casadesam.org/if-something-happened-tonight
 - When a visitor asks for one of these resources, give the direct public URL. Do not say that a known link is unavailable or ask the visitor to contact Amie merely to obtain it.
 
 Visitors, volunteers, and public attention

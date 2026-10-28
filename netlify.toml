@@ -38,3 +38,8 @@
   from = "/roi-of-independence"
   to = "/roi-of-independence.html"
   status = 200
+
+[[redirects]]
+  from = "/if-something-happened-tonight"
+  to = "/if-something-happened-tonight.html"
+  status = 200

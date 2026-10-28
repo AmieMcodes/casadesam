@@ -24,6 +24,7 @@ export function createUploadHandler({ getProductStore = () => getStore("digital-
       if (!acceptedSecrets.includes(secret)) return new Response("Upload rejected", { status: 403, headers: { "Cache-Control": "no-store" } });
       const product = String(form.get("product") || "roi");
       if (!["roi", "tonight"].includes(product)) return new Response("Unknown product", { status: 400 });
+      if (secret === env.PRODUCT_UPLOAD_TONIGHT_SECRET && product !== "tonight") return new Response("Upload rejected", { status: 403 });
       const key = product === "tonight" ? TONIGHT_BUNDLE_KEY : ROI_BUNDLE_KEY;
       const readBundle = product === "tonight" ? readTonightBundle : readRoiBundle;
       const createBundle = product === "tonight" ? createTonightBundle : createRoiBundle;

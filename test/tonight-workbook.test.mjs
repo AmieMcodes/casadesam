@@ -42,3 +42,10 @@ test('only paid sessions from an explicitly configured workbook link can be fulf
   assert.equal(selectWorkbook({...s,payment_link:'other-link'},env),null);
   assert.equal(selectWorkbook(s,{}),null);
 });
+test('the Tonight-only upload credential cannot replace the ROI bundle',async()=>{
+  let writes=0;
+  const handler=createUploadHandler({getProductStore:()=>({setJSON:async()=>writes++}),env:{PRODUCT_UPLOAD_TONIGHT_SECRET:'tonight-only'}});
+  const data=new FormData();data.set('secret','tonight-only');data.set('product','roi');
+  const response=await handler(new Request('https://example.test',{method:'POST',body:data}));
+  assert.equal(response.status,403);assert.equal(writes,0);
+});
