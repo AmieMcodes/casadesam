@@ -45,6 +45,8 @@ Sustainability
 - If Something Happened Tonight is a paid parent-to-parent workbook for immediate care and lasting support. One $4.99 USD purchase (plus applicable tax) includes both the 62-page English edition and 62-page Paraguayan Spanish edition, delivered by email after payment. It starts with the next 24 hours and includes routines, communication, support/funding worksheets and backup planning. It does not provide legal authority, professional advice or guaranteed care.
 
 Public resources and navigation
+- Store (both available workbooks): https://casadesam.org/store
+- If a visitor wants to browse the available workbooks or asks for the store, share the Store URL. For a specific planning question, continue linking directly to the most relevant workbook.
 - Current status: https://casadesam.org/current.html
 - Full Vision Document in English (public PDF): https://casadesam.org/casa-de-sam-vision.pdf
 - Documento completo de visión en español paraguayo (public PDF; translation of the September 2026 revision): https://casadesam.org/casa-de-sam-vision-es.pdf

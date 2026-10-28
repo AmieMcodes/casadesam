@@ -43,3 +43,8 @@
   from = "/if-something-happened-tonight"
   to = "/if-something-happened-tonight.html"
   status = 200
+
+[[redirects]]
+  from = "/store"
+  to = "/store.html"
+  status = 200

@@ -198,7 +198,7 @@ p{ margin: 0 0 1.25em; }
 }
 
 .sam-nav-inner{
-  max-width: 920px;
+  max-width: 1140px;
   margin: 0 auto;
   padding: 18px 20px;
   display: flex;
@@ -208,6 +208,8 @@ p{ margin: 0 0 1.25em; }
 }
 
 .sam-brand{
+  white-space: nowrap;
+  flex-shrink: 0;
   text-decoration: none;
   color: var(--sam-ink);
   font-weight: 650;
