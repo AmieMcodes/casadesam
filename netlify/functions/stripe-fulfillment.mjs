@@ -2,6 +2,9 @@ import crypto from "node:crypto";
 import { getStore } from "@netlify/blobs";
 import { readRoiBundle, buildRoiDeliveryEmail } from "./lib/roi-workbook.mjs";
 
+import { readTonightBundle, buildTonightDeliveryEmail } from "./lib/tonight-workbook.mjs";
+import { selectWorkbook } from "./lib/workbook-routing.mjs";
+
 const CONTACT_ACTION_URL = "https://casadesam.org/.netlify/functions/contact-action";
 
 function verifyStripeSignature(payload, signatureHeader, secret) {
@@ -52,7 +55,7 @@ async function apiRequest(apiKey, path, { method = "GET", body, headers = {}, al
   return data;
 }
 
-async function sendRoiDeliveryEmail({ email, stripeSessionId, pdfs, webhookSecret }) {
+async function sendRoiDeliveryEmail({ email, stripeSessionId, pdfs, webhookSecret, product = "roi" }) {
   const sendingKey = process.env.RESEND_API_KEY;
   if (!sendingKey) throw new Error("RESEND_API_KEY is not configured");
 
@@ -61,15 +64,15 @@ async function sendRoiDeliveryEmail({ email, stripeSessionId, pdfs, webhookSecre
   const quarterlyUrl = `${CONTACT_ACTION_URL}?token=${encodeURIComponent(quarterlyToken)}`;
   const boardUrl = `${CONTACT_ACTION_URL}?token=${encodeURIComponent(boardToken)}`;
 
-  const delivery = buildRoiDeliveryEmail({ pdfs, quarterlyUrl, boardUrl });
+  const delivery = product === "tonight" ? buildTonightDeliveryEmail({ pdfs }) : buildRoiDeliveryEmail({ pdfs, quarterlyUrl, boardUrl });
 
   return apiRequest(sendingKey, "/emails", {
     method: "POST",
-    headers: { "Idempotency-Key": `roi-delivery/${stripeSessionId}` },
+    headers: { "Idempotency-Key": `${product}-delivery/${stripeSessionId}` },
     body: {
       from: "Amie at Casa de SAM <hello@casadesam.org>", to: [email], reply_to: "hello@yourscripturecompanion.com",
       ...delivery,
-      tags: [{ name: "product", value: "roi_independence" }, { name: "purpose", value: "digital_delivery" }],
+      tags: [{ name: "product", value: product === "tonight" ? "tonight_workbook" : "roi_independence" }, { name: "purpose", value: "digital_delivery" }],
     },
   });
 }
@@ -95,14 +98,8 @@ async function syncRoiContact(email, sessionCreated) {
 
 async function fulfillRoi(session, stripeEventId, webhookSecret) {
   console.log("Fulfillment stage: start", stripeEventId, session.id);
-  const expectedPaymentLink = process.env.STRIPE_ROI_PAYMENT_LINK_ID;
-  if (!expectedPaymentLink) throw new Error("STRIPE_ROI_PAYMENT_LINK_ID is not configured");
-  if (session.payment_link !== expectedPaymentLink) { console.log("Ignoring Checkout Session from another Payment Link", session.payment_link); return; }
-  console.log("Fulfillment stage: payment link matched");
-  if (session.payment_status && !["paid", "no_payment_required"].includes(session.payment_status)) {
-    console.log("Checkout Session is not paid yet; waiting for async payment success", session.id, session.payment_status);
-    return;
-  }
+  const product = selectWorkbook(session, process.env);
+  if (!product) { console.log("Ignoring an unrelated or unpaid Checkout Session", session.id); return; }
   console.log("Fulfillment stage: payment confirmed", session.payment_status);
   if (!session.id) throw new Error("Checkout Session has no id");
 
@@ -114,7 +111,7 @@ async function fulfillRoi(session, stripeEventId, webhookSecret) {
   // Checkout Session so retries (including a different event type for the same payment)
   // cannot send the purchased workbook twice.
   const fulfillmentStore = getStore("stripe-fulfillment-state");
-  const fulfillmentKey = `roi/${session.id}.json`;
+  const fulfillmentKey = `${product}/${session.id}.json`;
   const existingFulfillment = await fulfillmentStore.get(fulfillmentKey, { type: "json", consistency: "strong" });
   if (existingFulfillment?.email_sent) {
     console.log("Fulfillment stage: already delivered; acknowledging duplicate", stripeEventId, session.id);
@@ -123,11 +120,11 @@ async function fulfillRoi(session, stripeEventId, webhookSecret) {
 
   console.log("Fulfillment stage: opening blob store");
   const store = getStore("digital-products");
-  const pdfs = await readRoiBundle(store);
+  const pdfs = product === "tonight" ? await readTonightBundle(store) : await readRoiBundle(store);
   console.log("Fulfillment stage: both ROI editions validated");
 
   console.log("Fulfillment stage: sending delivery email");
-  await sendRoiDeliveryEmail({ email, stripeSessionId: session.id, pdfs, webhookSecret });
+  await sendRoiDeliveryEmail({ email, stripeSessionId: session.id, pdfs, webhookSecret, product });
   console.log("Fulfillment stage: delivery email accepted by Resend");
 
   // Persist immediately after Resend accepts the delivery. Contact-list maintenance is
@@ -143,7 +140,7 @@ async function fulfillRoi(session, stripeEventId, webhookSecret) {
 
   console.log("Fulfillment stage: syncing Resend contact");
   try {
-    await syncRoiContact(email, session.created);
+    if (product === "roi") await syncRoiContact(email, session.created);
     console.log("Fulfillment stage: contact sync complete");
   } catch (error) {
     console.error("Fulfillment stage: contact sync failed after successful delivery; acknowledging Stripe event", stripeEventId, error);
