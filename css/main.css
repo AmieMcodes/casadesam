@@ -647,3 +647,7 @@ ul.sam-list li{
   .current-card,
   .current-status{ padding: 24px; }
 }
+
+/* Approved resource links in Gustavo replies remain readable at narrow widths. */
+.gustavo-answer a{color:inherit;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.gustavo-answer a:focus-visible{outline:2px solid currentColor;outline-offset:3px}

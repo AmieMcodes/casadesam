@@ -120,6 +120,13 @@
       }
       const answer = cleanAnswer(data.answer);
       waiting.textContent = answer;
+      try {
+        const { renderLinkedAnswer } = await import("/js/gustavo-links.mjs");
+        renderLinkedAnswer(waiting, answer);
+      } catch {
+        // Keep the readable plain-text answer if the optional link renderer cannot load.
+      }
+      messages.scrollTop = messages.scrollHeight;
       history.push({ role: "user", content: message }, { role: "assistant", content: answer });
       history.splice(0, Math.max(0, history.length - 12));
       if (data.offerContact) handoff.hidden = false;
