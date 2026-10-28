@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { getStore } from "@netlify/blobs";
+import { readRoiBundle, buildRoiDeliveryEmail } from "./lib/roi-workbook.mjs";
 
 const CONTACT_ACTION_URL = "https://casadesam.org/.netlify/functions/contact-action";
 
@@ -51,7 +52,7 @@ async function apiRequest(apiKey, path, { method = "GET", body, headers = {}, al
   return data;
 }
 
-async function sendRoiDeliveryEmail({ email, stripeSessionId, pdfBase64, webhookSecret }) {
+async function sendRoiDeliveryEmail({ email, stripeSessionId, pdfs, webhookSecret }) {
   const sendingKey = process.env.RESEND_API_KEY;
   if (!sendingKey) throw new Error("RESEND_API_KEY is not configured");
 
@@ -60,29 +61,14 @@ async function sendRoiDeliveryEmail({ email, stripeSessionId, pdfBase64, webhook
   const quarterlyUrl = `${CONTACT_ACTION_URL}?token=${encodeURIComponent(quarterlyToken)}`;
   const boardUrl = `${CONTACT_ACTION_URL}?token=${encodeURIComponent(boardToken)}`;
 
-  const html = `
-    <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#18324a;line-height:1.6">
-      <p style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#55724a">Casa de SAM</p>
-      <h1 style="font-family:Georgia,serif;font-size:30px;line-height:1.2">Your ROI of Independence workbook is ready</h1>
-      <p>Thank you for purchasing <strong>The ROI of Independence: Is This Skill Worth What It Costs?</strong></p>
-      <p>Your complete Casa de SAM workbook is attached to this email as a PDF. Save it anywhere you keep important family-planning documents so you can return to the exercises and decision matrix over time.</p>
-      <hr style="border:0;border-top:1px solid #ddd5c7;margin:28px 0">
-      <h2 style="font-family:Georgia,serif">Want to stay connected?</h2>
-      <p><a href="${quarterlyUrl}" style="color:#18324a;font-weight:700">Get Casa de SAM's quarterly updates →</a><br><span style="color:#667085">Four meaningful updates per year about our progress, plans, and major milestones.</span></p>
-      <p><a href="${boardUrl}" style="color:#18324a;font-weight:700">I'm interested in possibly serving on the Casa de SAM board →</a><br><span style="color:#667085">No commitment. This simply lets us know you'd like to hear more as we build the board.</span></p>
-      <p style="font-size:14px;color:#667085">Your purchase does not automatically subscribe you to marketing emails. Each option above requires a separate confirmation.</p>
-      <p style="margin-top:32px">Thank you for supporting this work,<br><strong>Amie</strong><br>Founder, Casa de SAM</p>
-      <p style="font-size:12px;color:#7a7a7a">Questions? Reply to this email and your message will go to hello@yourscripturecompanion.com.</p>
-    </div>`;
-  const text = `Your ROI of Independence workbook is ready\n\nThank you for purchasing The ROI of Independence: Is This Skill Worth What It Costs?\n\nYour complete Casa de SAM workbook is attached to this email as a PDF.\n\nOptional next steps:\nQuarterly Casa de SAM updates (four per year): ${quarterlyUrl}\nBoard interest: ${boardUrl}\n\nYour purchase does not automatically subscribe you to marketing emails. Each option requires a separate confirmation.\n\nThank you for supporting this work,\nAmie\nFounder, Casa de SAM`;
+  const delivery = buildRoiDeliveryEmail({ pdfs, quarterlyUrl, boardUrl });
 
   return apiRequest(sendingKey, "/emails", {
     method: "POST",
     headers: { "Idempotency-Key": `roi-delivery/${stripeSessionId}` },
     body: {
       from: "Amie at Casa de SAM <hello@casadesam.org>", to: [email], reply_to: "hello@yourscripturecompanion.com",
-      subject: "Your Casa de SAM ROI workbook is ready", html, text,
-      attachments: [{ filename: "Casa_de_SAM_ROI_of_Independence.pdf", content: pdfBase64 }],
+      ...delivery,
       tags: [{ name: "product", value: "roi_independence" }, { name: "purpose", value: "digital_delivery" }],
     },
   });
@@ -137,14 +123,11 @@ async function fulfillRoi(session, stripeEventId, webhookSecret) {
 
   console.log("Fulfillment stage: opening blob store");
   const store = getStore("digital-products");
-  console.log("Fulfillment stage: reading ROI blob");
-  const pdf = await store.get("roi-of-independence.pdf", { type: "arrayBuffer", consistency: "strong" });
-  if (!pdf) throw new Error("ROI workbook is not present in Netlify Blobs");
-  console.log("Fulfillment stage: ROI blob loaded", pdf.byteLength);
-  const pdfBase64 = Buffer.from(pdf).toString("base64");
+  const pdfs = await readRoiBundle(store);
+  console.log("Fulfillment stage: both ROI editions validated");
 
   console.log("Fulfillment stage: sending delivery email");
-  await sendRoiDeliveryEmail({ email, stripeSessionId: session.id, pdfBase64, webhookSecret });
+  await sendRoiDeliveryEmail({ email, stripeSessionId: session.id, pdfs, webhookSecret });
   console.log("Fulfillment stage: delivery email accepted by Resend");
 
   // Persist immediately after Resend accepts the delivery. Contact-list maintenance is
