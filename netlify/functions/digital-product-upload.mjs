@@ -1,69 +1,47 @@
 import { getStore } from "@netlify/blobs";
-
-const MAX_FILE_BYTES = 5 * 1024 * 1024;
+import { createRoiBundle, readRoiBundle, ROI_BUNDLE_KEY, MAX_PDF_BYTES } from "./lib/roi-workbook.mjs";
 
 function page(body) {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Casa de SAM Product Upload</title><style>body{margin:0;background:#f7f2e8;color:#18324a;font-family:Arial,sans-serif}main{max-width:680px;margin:8vh auto;padding:40px;background:#fff;border:1px solid #d8d1c4;border-radius:16px}h1{font-family:Georgia,serif}label{display:block;margin:18px 0 8px;font-weight:700}input{width:100%;box-sizing:border-box;padding:12px}.btn{margin-top:20px;background:#18324a;color:#fff;border:0;border-radius:8px;padding:14px 20px;font-weight:700;cursor:pointer}.muted{color:#667085;font-size:.92rem}</style></head><body><main>${body}</main></body></html>`;
 }
 
-export default async (req) => {
-  if (req.method === "GET") {
-    return new Response(page(`<h1>Upload a Casa de SAM digital product</h1><p>This private admin page stores the PDF in Netlify Blobs so it does not need to live in the public GitHub repository.</p><form method="post" enctype="multipart/form-data"><label for="secret">Upload secret</label><input id="secret" name="secret" type="password" required><label for="file">ROI workbook PDF</label><input id="file" name="file" type="file" accept="application/pdf,.pdf" required><button class="btn" type="submit">Upload PDF</button></form><p class="muted">Maximum file size: 5 MB. The PDF is stored as <code>roi-of-independence.pdf</code>.</p>`), {
-      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
-    });
-  }
 
-  if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, POST" } });
-  }
+const HTML_HEADERS = { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" };
 
-  const configuredSecret = process.env.PRODUCT_UPLOAD_SECRET;
-  if (!configuredSecret) return new Response("Upload is not configured", { status: 503 });
-
-  try {
-    const form = await req.formData();
-    const suppliedSecret = String(form.get("secret") || "");
-    const file = form.get("file");
-
-    if (suppliedSecret !== configuredSecret) {
-      return new Response(page(`<h1>Upload rejected</h1><p>The upload secret was not correct.</p>`), {
-        status: 403,
-        headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
-      });
+export function createUploadHandler({ getProductStore = () => getStore("digital-products"), env = process.env } = {}) {
+  return async (req) => {
+    if (req.method === "GET") {
+      return new Response(page(`<h1>Upload both ROI workbook editions</h1><p>The PDFs are stored privately and published together as one complete delivery bundle.</p><form method="post" enctype="multipart/form-data"><label for="secret">Upload secret</label><input id="secret" name="secret" type="password" required><label for="file">English workbook PDF</label><input id="file" name="file" type="file" accept="application/pdf,.pdf" required><label for="spanish_file">Spanish workbook PDF</label><input id="spanish_file" name="spanish_file" type="file" accept="application/pdf,.pdf" required><button class="btn" type="submit">Publish both PDF editions</button></form><p class="muted">Maximum combined size: 4 MB for both PDFs.</p>`), { headers: HTML_HEADERS });
     }
-
-    if (!file || typeof file.arrayBuffer !== "function") {
-      return new Response("No file supplied", { status: 400 });
+    if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, POST" } });
+    const acceptedSecrets = [env.PRODUCT_UPLOAD_SECRET, env.PRODUCT_UPLOAD_AUTOMATION_SECRET].filter(Boolean);
+    if (!acceptedSecrets.length) return new Response("Upload is not configured", { status: 503 });
+    try {
+      const form = await req.formData();
+      const secret = String(form.get("secret") || "");
+      if (!acceptedSecrets.includes(secret)) return new Response("Upload rejected", { status: 403, headers: { "Cache-Control": "no-store" } });
+      const store = getProductStore();
+      if (form.get("operation") === "status") {
+        await readRoiBundle(store);
+        const current = await store.get(ROI_BUNDLE_KEY, { type: "json", consistency: "strong" });
+        return Response.json({ version: current.version, uploadedAt: current.uploadedAt, editions: current.editions.map(({ language, filename, bytes, sha256 }) => ({ language, filename, bytes, sha256 })) }, { headers: { "Cache-Control": "no-store" } });
+      }
+      const english = form.get("file");
+      const spanish = form.get("spanish_file");
+      if (!english || !spanish || typeof english.arrayBuffer !== "function" || typeof spanish.arrayBuffer !== "function") return new Response("Both English and Spanish PDF files are required", { status: 400 });
+      if (english.size + spanish.size > 4 * 1024 * 1024) return new Response("The combined PDF upload must be no larger than 4 MB", { status: 413 });
+      if ([english, spanish].some(file => file.size > MAX_PDF_BYTES)) return new Response("Each PDF must be no larger than 5 MB", { status: 413 });
+      if ([english, spanish].some(file => file.type && file.type !== "application/pdf")) return new Response("Only PDF files are accepted", { status: 415 });
+      const bundle = createRoiBundle(await english.arrayBuffer(), await spanish.arrayBuffer());
+      // One write publishes the pair atomically; validation above never changes the existing bundle.
+      await store.setJSON(ROI_BUNDLE_KEY, bundle);
+      return new Response(page(`<h1>Both editions published</h1><p>The English and Spanish workbooks are stored privately and ready to be attached to one delivery email.</p><p><a href="https://casadesam.org/roi-of-independence">Return to the product page</a></p>`), { headers: HTML_HEADERS });
+    } catch (error) {
+      console.error("Digital product upload failed", error.message);
+      const invalid = /PDF|5 MB/.test(error.message);
+      return new Response(invalid ? error.message : "Unable to publish or verify the workbook bundle", { status: invalid ? 400 : 500, headers: { "Cache-Control": "no-store" } });
     }
+  };
+}
 
-    if (file.size > MAX_FILE_BYTES) {
-      return new Response(page(`<h1>File is too large</h1><p>This uploader currently accepts PDFs up to 5 MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)} MB.</p>`), {
-        status: 413,
-        headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
-      });
-    }
-
-    if (file.type && file.type !== "application/pdf") {
-      return new Response("Only PDF files are accepted", { status: 415 });
-    }
-
-    const store = getStore("digital-products");
-    await store.set("roi-of-independence.pdf", await file.arrayBuffer(), {
-      metadata: {
-        filename: "Casa_de_SAM_ROI_of_Independence.pdf",
-        contentType: "application/pdf",
-        uploadedAt: new Date().toISOString(),
-      },
-    });
-
-    return new Response(page(`<h1>Upload complete</h1><p>The ROI workbook is now stored privately in Netlify Blobs and is ready for fulfillment.</p><p><a href="https://casadesam.org/roi-of-independence">Return to the product page</a></p>`), {
-      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
-    });
-  } catch (error) {
-    console.error("Digital product upload failed", error);
-    return new Response(page(`<h1>Upload failed</h1><p>Something went wrong while storing the PDF. Check the Netlify function logs for details.</p>`), {
-      status: 500,
-      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
-    });
-  }
-};
+export default createUploadHandler();
