@@ -53,7 +53,8 @@ export default async (req) => {
     const rawAnswer = payload?.choices?.[0]?.message?.content?.trim();
     if (!rawAnswer) return json({ error: "Gustavo could not answer just now. Please try again." }, 502);
     const offerContact = /\[OFFER_CONTACT\]/i.test(rawAnswer);
-    return json({ answer: rawAnswer.replace(/\[OFFER_CONTACT\]/gi, "").trim(), offerContact });
+    const boardMatch = rawAnswer.match(/\[BOARD_INTEREST_(EN|ES)\]/i);
+    return json({ answer: rawAnswer.replace(/\[OFFER_CONTACT\]|\[BOARD_INTEREST_(?:EN|ES)\]/gi, "").trim(), offerContact, boardInterest: !!boardMatch, boardLanguage: boardMatch?.[1].toLowerCase() });
   } catch (error) {
     console.error("Gustavo request failed", error);
     return json({ error: "Gustavo could not answer just now. Please try again." }, 500);

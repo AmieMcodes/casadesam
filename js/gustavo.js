@@ -101,7 +101,15 @@
     return history.map((item) => `${item.role === "user" ? "Visitor" : "Gustavo"}: ${item.content}`).join("\n\n");
   }
 
+  let board;
+  const boardReady = import("/js/gustavo-board.mjs")
+    .then(({ mountBoardConversation }) => {
+      board = mountBoardConversation({ root, messages, input, chatForm, addMessage });
+    }).catch(() => {});
+
   async function ask(message) {
+    await boardReady;
+    if (board?.active) return board.handleMessage(message);
     addMessage(message, "question");
     input.value = "";
     const waiting = addMessage("One moment…", "answer");
@@ -129,7 +137,8 @@
       messages.scrollTop = messages.scrollHeight;
       history.push({ role: "user", content: message }, { role: "assistant", content: answer });
       history.splice(0, Math.max(0, history.length - 12));
-      if (data.offerContact) handoff.hidden = false;
+      if (data.boardInterest) board?.offer(data.boardLanguage);
+      else if (data.offerContact) handoff.hidden = false;
     } catch {
       waiting.textContent = "I’m not available just now. Please try again in a moment.";
     } finally {

@@ -653,3 +653,20 @@ ul.sam-list li{
 /* Approved resource links in Gustavo replies remain readable at narrow widths. */
 .gustavo-answer a{color:inherit;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
 .gustavo-answer a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+
+/* Optional board-interest conversation and editable, consent-based review. */
+.gustavo-board-invite,.gustavo-board-controls{padding:8px 14px;display:flex;gap:7px;flex-wrap:wrap;border-top:1px solid var(--sam-line)}
+.gustavo-board-invite[hidden],.gustavo-board-controls[hidden]{display:none}
+.gustavo-board-invite button,.gustavo-board-controls button,.gustavo-board-review button{border:1px solid #b8c6b1;background:#edf0e8;color:#244844;padding:8px 10px;border-radius:9px;cursor:pointer;font-size:13px}
+.gustavo-board-controls button:disabled,.gustavo-board-review button:disabled{opacity:.55;cursor:wait}
+.gustavo-board-review{border:1px solid #cbd4c4;border-radius:12px;background:#fffdf8;padding:13px;font-size:14px}
+.gustavo-board-review fieldset{min-width:0;margin:18px 0;padding:10px;border:1px solid #d3dbcb;border-radius:8px}
+.gustavo-board-review legend{font-size:13px;color:#244844;font-weight:600;white-space:normal}
+.gustavo-board-review label{display:block;margin:10px 0;font-size:13px}
+.gustavo-board-review input:not([type=checkbox]),.gustavo-board-review textarea{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:9px;border:1px solid #b4c1ad;border-radius:7px;font:inherit;background:white;color:#1f2328}
+.gustavo-board-review textarea{resize:vertical;min-height:80px}
+.gustavo-board-review .gustavo-board-consent{display:flex;gap:9px;align-items:flex-start}
+.gustavo-board-consent input{flex:0 0 auto;margin-top:4px}
+.gustavo-board-review button{margin:5px 6px 5px 0}.gustavo-board-review button[type=submit]{background:#244844;color:white}
+.gustavo-chat-form[hidden]{display:none}
+.gustavo-board-review [hidden]{display:none}
