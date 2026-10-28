@@ -16,7 +16,7 @@ export function createUploadHandler({ getProductStore = () => getStore("digital-
       return new Response(page(`<h1>Upload both workbook editions</h1><p>The PDFs are stored privately and published together as one complete delivery bundle.</p><form method="post" enctype="multipart/form-data"><label for="product">Workbook</label><select name="product" id="product"><option value="roi">The ROI of Independence</option><option value="tonight">If Something Happened Tonight</option></select><label for="secret">Upload secret</label><input id="secret" name="secret" type="password" required><label for="file">English workbook PDF</label><input id="file" name="file" type="file" accept="application/pdf,.pdf" required><label for="spanish_file">Spanish workbook PDF</label><input id="spanish_file" name="spanish_file" type="file" accept="application/pdf,.pdf" required><button class="btn" type="submit">Publish both PDF editions</button></form><p class="muted">Maximum combined size: 4 MB for both PDFs.</p>`), { headers: HTML_HEADERS });
     }
     if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, POST" } });
-    const acceptedSecrets = [env.PRODUCT_UPLOAD_SECRET, env.PRODUCT_UPLOAD_AUTOMATION_SECRET].filter(Boolean);
+    const acceptedSecrets = [env.PRODUCT_UPLOAD_SECRET, env.PRODUCT_UPLOAD_AUTOMATION_SECRET, env.PRODUCT_UPLOAD_TONIGHT_SECRET].filter(Boolean);
     if (!acceptedSecrets.length) return new Response("Upload is not configured", { status: 503 });
     try {
       const form = await req.formData();
