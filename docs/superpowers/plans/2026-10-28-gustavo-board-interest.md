@@ -24,8 +24,15 @@
 - HTML in answers stays inert in review and email.
 
 ## Tasks
-- [ ] Test signed interview state, eight-question progression, skip/follow-up limits, review and email content; implement core.
-- [ ] Test handler consent, validation, retries and duplicate suppression; implement handler with injectable model/mail/store.
-- [ ] Add explicit board invitation in general Gus chat and a bilingual interview/review UI.
-- [ ] Configure fixed Amie recipient and state signing secret without changing existing keys.
-- [ ] Run full tests, inspect browser flow, publish the verified complete Git tree, test live and send one clearly labeled synthetic test inquiry to Amie.
+- [x] Test signed interview state, eight-question progression, skip/follow-up limits, review and email content; implement core.
+- [x] Test handler consent, validation, retries and duplicate suppression; implement handler with injectable model/mail/store.
+- [x] Add explicit board invitation in general Gus chat and a bilingual interview/review UI.
+- [x] Configure fixed Amie recipient and state signing secret without changing existing keys.
+- [x] Run full tests, inspect browser flow, publish the verified complete Git tree, test live and send one clearly labeled synthetic test inquiry to Amie.
+
+## Verification
+- 28 Node tests pass, including sixteen interview turns, edits, consent, duplicate suppression, refusal and mail failures.
+- Production English/Spanish invitations and interview starts verified; generic board questions do not trigger an application.
+- Live relevant follow-ups verified in both languages; a declined English follow-up advances.
+- One clearly labeled synthetic inquiry was sent through the browser review form and confirmed in Amie’s inbox.
+- Final invitation uses fixed bilingual copy; review opens at its first answer rather than jumping to the send button.

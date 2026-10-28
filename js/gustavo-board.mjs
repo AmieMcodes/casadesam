@@ -14,7 +14,14 @@ export function mountBoardConversation({root,messages,input,chatForm,addMessage}
     const r=await fetch('/api/gustavo-board',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,state:token,...extra})});
     const data=await r.json();if(!r.ok)throw new Error(data.error||copy[language].error);return data;
   }
-  function accept(data,waiting){token=data.state||token;language=data.language||language;labels();waiting.textContent=data.answer||'';if(data.stage==='review')showReview(data.review);messages.scrollTop=messages.scrollHeight;}
+  function accept(data,waiting){
+    token=data.state||token;language=data.language||language;labels();waiting.textContent=data.answer||'';
+    if(data.stage==='review'){
+      showReview(data.review);
+      const form=messages.querySelector('.gustavo-board-review');
+      messages.scrollTop+=form.getBoundingClientRect().top-messages.getBoundingClientRect().top-10;
+    }else messages.scrollTop=messages.scrollHeight;
+  }
   function exit(){active=false;token=null;controls.hidden=true;invite.hidden=true;chatForm.hidden=false;input.value='';}
   function field(label,type,value=''){
     const wrap=el('label',label);const n=el(type==='textarea'?'textarea':'input');

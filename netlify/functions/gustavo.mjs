@@ -54,7 +54,11 @@ export default async (req) => {
     if (!rawAnswer) return json({ error: "Gustavo could not answer just now. Please try again." }, 502);
     const offerContact = /\[OFFER_CONTACT\]/i.test(rawAnswer);
     const boardMatch = rawAnswer.match(/\[BOARD_INTEREST_(EN|ES)\]/i);
-    return json({ answer: rawAnswer.replace(/\[OFFER_CONTACT\]|\[BOARD_INTEREST_(?:EN|ES)\]/gi, "").trim(), offerContact, boardInterest: !!boardMatch, boardLanguage: boardMatch?.[1].toLowerCase() });
+    const boardLanguage = boardMatch?.[1].toLowerCase();
+    const invitation = boardLanguage === "es"
+      ? "Gracias por tu interés en integrar el Consejo Directivo de Casa de SAM. Podemos conversar sobre ocho temas, una pregunta a la vez, con alguna pregunta de seguimiento cuando ayude a entender tu perspectiva. Podés omitir lo que quieras y revisar todo antes de autorizar el envío a Amie. Esto es una expresión de interés, no un nombramiento. Elegí «Conversar sobre el Consejo Directivo» para empezar."
+      : "Thank you for your interest in serving on the Casa de SAM board. We can explore eight topics, one question at a time, with an occasional follow-up to understand your perspective. You can skip anything and review everything before giving permission to email Amie. This is an expression of interest, not an appointment. Choose ‘Explore board service’ to begin.";
+    return json({ answer: boardMatch ? invitation : rawAnswer.replace(/\[OFFER_CONTACT\]/gi, "").trim(), offerContact: !boardMatch && offerContact, boardInterest: !!boardMatch, boardLanguage });
   } catch (error) {
     console.error("Gustavo request failed", error);
     return json({ error: "Gustavo could not answer just now. Please try again." }, 500);
