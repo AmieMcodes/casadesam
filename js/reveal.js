@@ -30,3 +30,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   reveals.forEach(el => observer.observe(el));
 });
+
+// Independent, first-party loader. Its disabled configuration makes no Google requests.
+(() => {
+  const analytics = document.createElement('script');
+  analytics.type = 'module';
+  analytics.src = '/js/analytics-consent.mjs';
+  document.head.append(analytics);
+})();
