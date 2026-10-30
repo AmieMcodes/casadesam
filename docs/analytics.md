@@ -1,6 +1,12 @@
 # Optional basic traffic analytics — prepared, NOT activated
 
-**Status (2026-10-30):** `js/analytics-config.mjs` intentionally has `enabled: false` and `measurementId: ''`. This branch must not be merged/activated as part of the preparation task. The production site has not been changed by this work.
+**Status (2026-10-30):** `js/analytics-config.mjs` intentionally has `enabled: false` and the verified public measurement ID `G-GYF79S5CW7`. This branch must not be merged/activated as part of the preparation task. The production site has not been changed by this work.
+
+## Account/stream handoff (2026-10-30)
+
+The owner-account setup agent verified the **Casa de SAM website** stream for `https://casadesam.org`, stream ID `16239335133`, measurement ID `G-GYF79S5CW7`. Approved regional terms were accepted, all optional account sharing is off, and Enhanced Measurement is off with the setting persisted. Google Signals/advertising settings are still being checked. This source is the setup agent's verified Google UI handoff; the repository agent did not independently access the account.
+
+The real ID is staged only. `enabled: false` still makes the module inert. Wait for the setup agent's remaining settings confirmation and release handoff before enabling or merging. The user's original installation authorization remains the basis; no redundant generic installation approval is needed.
 
 ## What this adds
 
@@ -26,10 +32,10 @@ Removing a script element would not unload already executed code, so the impleme
 
 ## Required before any later activation
 
-1. Obtain the actual Casa web-stream `G-…` measurement ID and confirm the property belongs to the intended owner/account. Do not insert a test/placeholder ID into a deployed active configuration.
+1. Real stream/measurement IDs are staged from the verified account handoff above. Recheck the destination before release; never substitute a test/placeholder ID.
 2. Verify the stream's **entire Enhanced Measurement setting is off**, Google Signals/advertising/user-provided-data collection are off, optional account data sharing is off, and no connected advertising destinations/tags are enabled. Do not assume client flags substitute for the account choices.
 3. Inspect current public/privacy wording and the enabled notice for accuracy against the actual property settings. This file is implementation guidance, not a new broad legal policy.
-4. Obtain separate activation/merge authorization. Set the real ID and enabled flag only in that authorized release; keep host/path guards and all restrictions.
+4. Wait for the setup agent to confirm the remaining settings and authorize the release handoff under the existing installation request. Only then set `enabled: true`; keep host/path guards and all restrictions. This staging task does not activate or merge.
 5. Use a permitted browser and actual network inspector (no local Chromium policy bypass):
    - Fresh/no choice and rejected: zero Google tag/collect requests and no GA cookies.
    - Explicit acceptance: one loader, one manual canonical page view; no raw query/hash/referrer/dynamic title/PII in the **actual requests**, including standard automatic events.

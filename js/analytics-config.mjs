@@ -2,7 +2,7 @@
 // Never enable via URL parameters, local storage, preview hosts, or a runtime override.
 export const analyticsConfig = {
   enabled: false,
-  measurementId: '',
+  measurementId: 'G-GYF79S5CW7',
   pages: {
     "/index.html": {
       "path": "/",

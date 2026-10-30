@@ -1,7 +1,7 @@
 # Optional basic traffic analytics (branch preparation)
 
 ## Approved scope
-Prepare, do not activate, Google Analytics for Casa de SAM. Basic traffic only; no advertising, optional sharing, Gustavo conversations, or form content. This branch must retain `enabled: false` and an empty measurement ID. No production deployment or merge is authorized by this task.
+Prepare, do not activate, Google Analytics for Casa de SAM. Basic traffic only; no advertising, optional sharing, Gustavo conversations, or form content. This branch must retain `enabled: false`. The initially empty measurement ID was replaced, under the later verified account handoff, with public ID `G-GYF79S5CW7` (stream `16239335133`); staging it does not activate collection. No production deployment or merge is authorized by this task.
 
 ## Design
 - Preserve the existing reveal/image behavior byte-for-byte; append an independent first-party module loader. No broad HTML rewrite, dependencies, server functions, or hosting-config changes.

@@ -4,7 +4,7 @@
 
 **Goal:** Prepare disabled-by-default, explicit opt-in basic traffic analytics without collecting Gustavo/form content.
 
-**Architecture:** A first-party module is loaded independently by the existing shared reveal script. It uses fixed public-page metadata, an opt-in controller and small footer settings UI. Google remains unloaded until consent; the branch configuration stays disabled with an empty ID.
+**Architecture:** A first-party module is loaded independently by the existing shared reveal script. It uses fixed public-page metadata, an opt-in controller and small footer settings UI. Google remains unloaded until consent; the branch configuration stays disabled; the later verified account handoff stages real ID `G-GYF79S5CW7` without activation.
 
 **Tech Stack:** Existing static HTML/vanilla JS, ES modules, Node built-in test runner; no new dependencies.
 
@@ -12,7 +12,7 @@
 
 ## Global Constraints
 - Branch only; no merge, production tag activation, or publishing.
-- `enabled: false`, measurement ID `''`; exact HTTPS `casadesam.org` guard.
+- `enabled: false`, measurement ID `G-GYF79S5CW7` (verified staging handoff); exact HTTPS `casadesam.org` guard.
 - Never send form/chat content, raw URLs/referrers/titles, advertising consent or optional sharing.
 - Preserve existing reveal behavior; no hosting or Gustavo changes.
 - Consent lifetime 90 days, version 1; unavailable persistence is current-page-only consent.
@@ -43,7 +43,7 @@
 
 ### Task 3: Review and branch delivery
 **Files:** Create `docs/analytics.md`; update this checklist with evidence.
-**Interfaces:** Operational checklist states ID insertion and account-side verification needed; no production activation.
+**Interfaces:** Operational checklist records the staged real ID and remaining account-side verification; no production activation.
 - [x] Document source-backed behavior, excluded pages/data, consent cookies, revocation limitations, and real-browser network QA still required.
 - [x] Run fresh `node --test`, syntax/diff checks and independent whole-branch review; resolve important findings with failing regression tests first.
-- [ ] Verify fresh remote main, write an isolated branch through supported GitHub tools. Keep disabled configuration; no PR, preview, or merge (scope clarified by parent). Report exact commit, tests, review and activation blockers.
+- [x] Verify fresh remote main, write an isolated branch through supported GitHub tools. Keep disabled configuration; no PR, preview, or merge (scope clarified by parent). Report exact commit, tests, review and activation blockers.
