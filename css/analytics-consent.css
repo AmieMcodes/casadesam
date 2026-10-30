@@ -1,0 +1,34 @@
+/* In-flow notice: no overlay, chat obstruction, or motion. */
+.casa-analytics-notice {
+  background: #edf2e9;
+  border-bottom: 1px solid var(--sam-olive, #4f6f52);
+  color: var(--sam-ink, #1f2328);
+  padding: 24px max(20px, calc((100% - 960px) / 2));
+  font-size: 1rem;
+}
+.casa-analytics-notice[hidden] { display: none; }
+.casa-analytics-notice h2 { margin: 0 0 12px; font-size: 1.25rem; color: #244844; }
+.casa-analytics-notice p { margin: 0 0 14px; max-width: 960px; }
+.casa-analytics-status { font-size: .9rem; }
+.casa-analytics-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.casa-analytics-actions button,
+.casa-analytics-settings {
+  font: inherit;
+  cursor: pointer;
+  color: #244844;
+  background: #fffdf8;
+  border: 1px solid #4f6f52;
+  border-radius: 8px;
+  min-height: 44px;
+  padding: 9px 16px;
+}
+.casa-analytics-actions button:hover,
+.casa-analytics-settings:hover { background: #e1ebdc; }
+.casa-analytics-actions button:focus-visible,
+.casa-analytics-settings:focus-visible,
+.casa-analytics-notice h2:focus-visible { outline: 3px solid #244844; outline-offset: 3px; }
+.casa-analytics-actions button:disabled { opacity: .65; cursor: not-allowed; }
+.casa-analytics-settings { margin-top: 12px; }
+.casa-analytics-information { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.casa-analytics-information a { color: #244844; text-underline-offset: 3px; }
+.casa-analytics-information a:focus-visible { outline: 3px solid #244844; outline-offset: 3px; }
