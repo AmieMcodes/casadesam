@@ -1,0 +1,13 @@
+/* Full-frame approved photos and accessible tables for the October 23 editorial batch. */
+.blog-oct23-article .blog-photo { margin: 28px 0 36px; }
+.blog-oct23-article .blog-photo.portrait { max-width: 520px; margin-left: auto; margin-right: auto; }
+.blog-oct23-article .blog-photo .blog-feature-image { margin: 0 0 16px; height: auto; }
+.blog-oct23-article .blog-photo figcaption { color: var(--sam-mute); font-size: .95rem; line-height: 1.65; }
+.blog-oct23-article .blog-table-wrap { overflow-x: auto; max-width: 100%; margin: 24px 0; }
+.blog-oct23-article .blog-table-wrap table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.blog-oct23-article .blog-table-wrap th, .blog-oct23-article .blog-table-wrap td { padding: 12px; border: 1px solid var(--sam-line); text-align: left; vertical-align: top; }
+.blog-oct23-article .blog-table-wrap th { background: #f1eee5; }
+.blog-oct23-article a { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .blog-oct23-article .blog-table-wrap th, .blog-oct23-article .blog-table-wrap td { padding: 9px; }
+}
