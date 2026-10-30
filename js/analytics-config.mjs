@@ -1,7 +1,7 @@
-// Activation requires stream settings verification and a separate authorized release.
+// Casa account/stream privacy settings verified 2026-10-30; release authorized.
 // Never enable via URL parameters, local storage, preview hosts, or a runtime override.
 export const analyticsConfig = {
-  enabled: false,
+  enabled: true,
   measurementId: 'G-GYF79S5CW7',
   pages: {
     "/index.html": {

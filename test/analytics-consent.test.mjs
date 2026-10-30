@@ -54,9 +54,9 @@ function fixture({ path = '/', hostname = 'casadesam.org', protocol = 'https:', 
 const load = f => { const script = f.scripts()[0]; assert.ok(script, 'consented loader exists'); script.onload(); };
 const pageViews = f => f.commands().filter(c => c[0] === 'event' && c[1] === 'page_view');
 
-test('disabled production config has no UI, storage, Google loader or data layer', () => {
+test('disabled configuration has no UI, storage, Google loader or data layer', () => {
   const f = fixture();
-  assert.equal(startAnalytics(f.win, analyticsConfig), null);
+  assert.equal(startAnalytics(f.win, { ...analyticsConfig, enabled: false }), null);
   assert.equal(f.elements.length, 3); assert.equal(f.scripts().length, 0);
   assert.equal(f.win.casaAnalyticsLayer, undefined); assert.equal(f.values.size, 0);
 });
@@ -250,4 +250,18 @@ test('if storage write and removal both fail, revocation stays off here and visi
   controller.reject(); assert.equal(f.win[`ga-disable-${ID}`], true); assert.equal(controller.choice(), 'denied');
   assert.equal(f.elements.find(e => e.id === 'casa-analytics-notice').hidden, false);
   assert.ok(f.elements.some(e => /could not save this choice/.test(e.textContent || '') && /earlier saved choice may return/.test(e.textContent || '')));
+});
+
+
+test('released configuration targets only the verified Casa stream and still waits for opt-in', () => {
+  const f = fixture(); const controller = startAnalytics(f.win);
+  assert.ok(controller); assert.equal(controller.choice(), 'unknown');
+  assert.equal(f.scripts().length, 0); assert.equal(f.win.casaAnalyticsLayer, undefined);
+  controller.accept(); load(f);
+  assert.equal(f.scripts()[0].src, 'https://www.googletagmanager.com/gtag/js?id=G-GYF79S5CW7&l=casaAnalyticsLayer');
+  const config = f.commands().find(c => c[0] === 'config'); assert.equal(config[1], 'G-GYF79S5CW7');
+  assert.equal(config[2].send_page_view, false); assert.equal(config[2].allow_google_signals, false);
+  assert.equal(pageViews(f)[0][2].send_to, 'G-GYF79S5CW7');
+  assert.equal(pageViews(f)[0][2].page_location, 'https://casadesam.org/');
+  controller.reject(); assert.equal(f.win['ga-disable-G-GYF79S5CW7'], true);
 });

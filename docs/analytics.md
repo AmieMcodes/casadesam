@@ -1,18 +1,25 @@
-# Optional basic traffic analytics — prepared, NOT activated
+# Optional basic traffic analytics
 
-**Status (2026-10-30):** `js/analytics-config.mjs` intentionally has `enabled: false` and the verified public measurement ID `G-GYF79S5CW7`. This branch must not be merged/activated as part of the preparation task. The production site has not been changed by this work.
+**Release configuration (2026-10-30):** `js/analytics-config.mjs` has `enabled: true` and verified public measurement ID `G-GYF79S5CW7`. Google still remains unloaded until valid opt-in. Release is authorized through the reviewed branch, normal PR checks/merge and Netlify deployment under the original installation request. No advertising or chat/form collection is authorized.
 
-## Account/stream handoff (2026-10-30)
+## Confirmed account/stream handoff (2026-10-30)
 
-The owner-account setup agent verified the **Casa de SAM website** stream for `https://casadesam.org`, stream ID `16239335133`, measurement ID `G-GYF79S5CW7`. Approved regional terms were accepted, all optional account sharing is off, and Enhanced Measurement is off with the setting persisted. Google Signals/advertising settings are still being checked. This source is the setup agent's verified Google UI handoff; the repository agent did not independently access the account.
+The owner-account setup agent verified account `414218332`, property `561684841`, **Casa de SAM website** stream `16239335133`, for `https://casadesam.org`, measurement ID `G-GYF79S5CW7`. Approved regional terms were accepted. Confirmed settings:
 
-The real ID is staged only. `enabled: false` still makes the module inert. Wait for the setup agent's remaining settings confirmation and release handoff before enabling or merging. The user's original installation authorization remains the basis; no redundant generic installation approval is needed.
+- All optional account sharing **off**.
+- Entire Enhanced Measurement **off**, persisted.
+- Google Signals **off** (the UI offers turning it on).
+- User-provided data collection **off**.
+- Ads personalization saved for **0 of 307 regions**.
+- Granular location/device data **off**.
+
+These facts come from the setup agent's actual Google UI verification; the repository agent did not independently access the account. The setup agent authorized the release handoff. No redundant generic installation approval is required. Client consent guards and privacy restrictions remain unchanged.
 
 ## What this adds
 
 An independent first-party loader at the end of `js/reveal.js` imports the consent module. The existing image corrections and scroll reveal behavior are unchanged. No HTML pages, Gustavo scripts, forms, Netlify configuration, dependencies, or payment/delivery code are changed.
 
-When disabled, the module renders no analytics UI, writes no consent record and loads no Google resource. If explicitly activated later, it runs only on HTTPS `casadesam.org`, on 8 fixed informational pages and the 48 published blog articles present at preparation time. Known clean paths map to the same static canonical metadata as `.html` paths. The blog template, store, payment/guide pages, unknown paths, preview deployments, localhost, other hosts and HTTP are excluded. New pages require an explicit allowlist update.
+When disabled, the module renders no analytics UI, writes no consent record and loads no Google resource. When enabled, it runs only on HTTPS `casadesam.org`, on 8 fixed informational pages and the 48 published blog articles present at preparation time. Known clean paths map to the same static canonical metadata as `.html` paths. The blog template, store, payment/guide pages, unknown paths, preview deployments, localhost, other hosts and HTTP are excluded. New pages require an explicit allowlist update.
 
 ## Consent and collection
 
@@ -30,25 +37,25 @@ Turning analytics off sets Google's documented `ga-disable-<ID>` flag before cle
 
 Removing a script element would not unload already executed code, so the implementation relies on Google's documented disable flag instead. Data already sent, or requests already in flight before revocation, cannot be recalled. Revocation is not a request to delete historical Analytics data. If the library fails to load, analytics stays off with no retry loop; another page provides a fresh attempt if explicitly accepted.
 
-## Required before any later activation
+## Release and verification checklist
 
-1. Real stream/measurement IDs are staged from the verified account handoff above. Recheck the destination before release; never substitute a test/placeholder ID.
-2. Verify the stream's **entire Enhanced Measurement setting is off**, Google Signals/advertising/user-provided-data collection are off, optional account data sharing is off, and no connected advertising destinations/tags are enabled. Do not assume client flags substitute for the account choices.
-3. Inspect current public/privacy wording and the enabled notice for accuracy against the actual property settings. This file is implementation guidance, not a new broad legal policy.
-4. Wait for the setup agent to confirm the remaining settings and authorize the release handoff under the existing installation request. Only then set `enabled: true`; keep host/path guards and all restrictions. This staging task does not activate or merge.
-5. Use a permitted browser and actual network inspector (no local Chromium policy bypass):
+1. Preserve the verified destination and all client consent/host/path restrictions. Recheck account settings if the destination or Google configuration changes. Do not assume client flags substitute for account choices.
+2. Use the reviewed branch, normal PR/Netlify preview checks and normal merge. A preview host intentionally cannot initialize analytics; it tests delivery, not Google collection. No PR approval review action is implied by release authorization.
+3. After production deployment, use a permitted browser for notice/accept/reject/settings and page checks. The account setup agent will check Realtime after a deliberately consented visit. Record the exact consented page/time; do not enter private test data or submit contact forms.
+4. Where a network inspector is permitted, verify the actual requests:
    - Fresh/no choice and rejected: zero Google tag/collect requests and no GA cookies.
-   - Explicit acceptance: one loader, one manual canonical page view; no raw query/hash/referrer/dynamic title/PII in the **actual requests**, including standard automatic events.
-   - Exercise Gustavo and forms with harmless synthetic text; no form/chat/interaction content/events sent. Do not submit real contact forms merely for QA.
-   - Revoke both while loading and after loaded: no new collection/cookies thereafter, apart from an already in-flight request; no reload or lost input. Reaccept does not duplicate the manual view.
-   - Check saved choices, expiry, cross-tab rejection, blocked storage, keyboard focus, mobile layout, and excluded routes.
-6. Verify production after an authorized merge. This preparation is branch-only: no PR or preview deployment is created. A disabled build would not prove real Google-network behavior. If a separate staging stream is needed for network QA, obtain approval for that additional destination rather than bypassing the production-host guard.
+   - Explicit acceptance: one loader, one manual canonical page view; no raw query/hash/referrer/dynamic title/PII in actual requests, including standard automatic events.
+   - Harmless synthetic Gustavo/form interaction: no form/chat content or interaction events. No real contact submission is needed.
+   - Revoke while loading and after loaded: no new collection/cookies thereafter, apart from an already in-flight request; no reload or lost input. Reaccept does not duplicate the manual view.
+   - Saved choices, expiry, cross-tab rejection, blocked storage, keyboard focus, mobile layout, and excluded routes.
+5. **QA limitation:** Network-inspector access is currently policy-blocked in the available browser route; do not bypass it or claim packet-level verification. Real Google-wire, enabled mobile layout, and other browser checks not actually performed must remain explicitly unverified. Automated tests and Realtime are different evidence, not substitutes. The release handoff permits proceeding with these limits reported honestly.
+6. Verify the published commit/config and unchanged unrelated content after normal deployment. Do not create a staging destination or bypass the production-host guard without separate authorization.
 
 ## Verification in this branch
 
 Run `node --test` after installing the existing package dependency. No new dependency is required. Analytics tests execute the real controller against a small fake browser boundary and inspect the exact Google loader/command payload. They cover disabled/invalid configuration, host/path guards, rejection, saved consent, expiry, storage failure, async revoke/reaccept, failed load, cross-tab/bfcache handling, UI controls and unchanged reveal/image behavior.
 
-**Limit:** These tests do not load Google and do not prove Google's remote library, server settings, HTTP behavior or real layout/accessibility. Actual-network and desktop/mobile visual QA remain outstanding before activation. Existing repository tests are also run; there is no existing npm test script.
+**Limit:** These tests do not load Google and do not prove Google's remote library, server settings, HTTP behavior or real layout/accessibility. Actual-network and any unperformed desktop/mobile visual QA remain outstanding; see the release limitations above. Existing repository tests are also run; there is no existing npm test script.
 
 ## Primary references checked 2026-10-30
 
