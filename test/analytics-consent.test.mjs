@@ -185,7 +185,7 @@ test('eligible notice offers equal explicit choices and footer settings can revo
   named('Analytics settings').click(); assert.equal(notice.hidden, false);
   named('Accept analytics').click(); load(f); assert.equal(notice.hidden, true);
   named('Analytics settings').click(); named('Turn analytics off').click(); assert.equal(f.win[`ga-disable-${ID}`], true);
-  assert.ok(f.elements.filter(e => Object.keys(e.listeners).length).every(e => e.tagName === 'BUTTON'));
+  assert.ok(f.elements.filter(e => Object.keys(e.listeners).length).every(e => e.tagName === 'BUTTON' || (e.tagName === 'DETAILS' && Object.keys(e.listeners).every(type => type === 'toggle'))));
 });
 
 test('closing settings never opts in and repeated start does not duplicate UI or listeners', () => {
@@ -253,7 +253,7 @@ test('if storage write and removal both fail, revocation stays off here and visi
 });
 
 
-test('released configuration targets only the verified Casa stream and still waits for opt-in', () => {
+test('direct consent controller defaults to opt-in and targets only the verified Casa stream', () => {
   const f = fixture(); const controller = startAnalytics(f.win);
   assert.ok(controller); assert.equal(controller.choice(), 'unknown');
   assert.equal(f.scripts().length, 0); assert.equal(f.win.casaAnalyticsLayer, undefined);
@@ -264,4 +264,96 @@ test('released configuration targets only the verified Casa stream and still wai
   assert.equal(pageViews(f)[0][2].send_to, 'G-GYF79S5CW7');
   assert.equal(pageViews(f)[0][2].page_location, 'https://casadesam.org/');
   controller.reject(); assert.equal(f.win['ga-disable-G-GYF79S5CW7'], true);
+});
+
+test('automatic policy loads without persisting a false explicit grant', () => {
+  const f = fixture(); const c = startAnalytics(f.win, activeConfig(), 'automatic');
+  assert.equal(c.choice(), 'automatic'); assert.equal(f.values.size, 0); load(f);
+  assert.equal(pageViews(f).length, 1); assert.equal(f.win[`ga-disable-${ID}`], false);
+  assert.equal(f.elements.find(e=>e.id==='casa-analytics-notice').hidden, true);
+  c.reject(); assert.equal(f.win[`ga-disable-${ID}`], true);
+  assert.equal(JSON.parse(f.values.get(KEY)).choice, 'denied');
+});
+
+test('saved rejection always overrides automatic collection', () => {
+  const f = fixture(); f.values.set(KEY,f.record('denied'));
+  const c=startAnalytics(f.win,activeConfig(),'automatic');
+  assert.equal(c.choice(),'denied'); assert.equal(f.scripts().length,0);
+});
+
+test('automatic collection cannot survive a delayed or cross-tab rejection', () => {
+  const f=fixture(); startAnalytics(f.win,activeConfig(),'automatic');
+  f.values.set(KEY,f.record('denied')); load(f);
+  assert.equal(pageViews(f).length,0); assert.equal(f.win[`ga-disable-${ID}`],true);
+});
+
+test('automatic collection handles cross-tab rejection after load', () => {
+  const f=fixture(); startAnalytics(f.win,activeConfig(),'automatic'); load(f);
+  f.values.set(KEY,f.record('denied')); f.fire('storage',{key:KEY});
+  assert.equal(f.win[`ga-disable-${ID}`],true);
+});
+
+test('automatic collection is not carried as consent to a later restricted-region visit', () => {
+  const f=fixture(); startAnalytics(f.win,activeConfig(),'automatic'); load(f);
+  const next=fixture({stored:f.values.get(KEY)}); startAnalytics(next.win,activeConfig(),'consent');
+  assert.equal(next.scripts().length,0);
+});
+
+const regionalModule = await import('../js/analytics-consent.mjs');
+test('regional initializer exists',()=>assert.equal(typeof regionalModule.startRegionalAnalytics,'function'));
+for (const mode of ['consent','automatic']) test(`regional bootstrap waits for policy before Google: ${mode}`,async()=>{
+  const f=fixture({path:'/blog/what-is-a-group-home-for-adults-with-autism'}); let release;
+  f.win.fetch=(url,options)=>{assert.equal(url,'/analytics-region');assert.equal(options.cache,'no-store');assert.equal(options.credentials,'same-origin');return new Promise(r=>release=r);};
+  assert.equal(typeof regionalModule.startRegionalAnalytics,'function');
+  const pending=regionalModule.startRegionalAnalytics(f.win,activeConfig());
+  assert.equal(f.scripts().length,0);
+  release({ok:true,json:async()=>({mode})});
+  const c=await pending; assert.ok(c); assert.equal(f.scripts().length,mode==='automatic'?1:0);
+  if(mode==='automatic'){load(f);assert.equal(pageViews(f)[0][2].page_location,'https://casadesam.org/blog/what-is-a-group-home-for-adults-with-autism.html');}
+});
+for (const failure of ['network','http','json','malformed','timeout']) test(`owner-requested unknown ON on ${failure}`,async()=>{
+  const f=fixture();
+  f.win.fetch=async()=>{if(failure==='network')throw Error('offline');if(failure==='timeout')return new Promise(()=>{});return {ok:failure!=='http',json:async()=>{if(failure==='json')throw Error('json');return failure==='malformed'?{}:{mode:'automatic'};}};};
+  assert.equal(typeof regionalModule.startRegionalAnalytics,'function');
+  const pending=regionalModule.startRegionalAnalytics(f.win,activeConfig());
+  if(failure==='timeout')f.advance(2000);
+  const c=await pending;assert.equal(c.choice(),'automatic');assert.equal(f.scripts().length,1);
+});
+test('saved No wins even when geography lookup fails',async()=>{
+  const f=fixture();f.values.set(KEY,f.record('denied'));f.win.fetch=async()=>{throw Error('offline');};
+  assert.equal(typeof regionalModule.startRegionalAnalytics,'function');
+  const c=await regionalModule.startRegionalAnalytics(f.win,activeConfig());assert.equal(c.choice(),'denied');assert.equal(f.scripts().length,0);
+});
+test('excluded pages do not request geography',async()=>{
+  const f=fixture({path:'/store'});f.win.fetch=()=>{throw Error('must not fetch');};
+  assert.equal(typeof regionalModule.startRegionalAnalytics,'function');
+  assert.equal(await regionalModule.startRegionalAnalytics(f.win,activeConfig()),null);
+});
+
+test('compact notice keeps information in accessible expandable details',()=>{
+ const f=fixture();startAnalytics(f.win,activeConfig());
+ const notice=f.elements.find(e=>e.id==='casa-analytics-notice');
+ assert.ok(notice.children.some(e=>e.className==='casa-analytics-summary'));
+ const details=f.elements.find(e=>e.tagName==='DETAILS');assert.ok(details);
+ assert.ok(details.children.some(e=>e.tagName==='SUMMARY'&&e.textContent==='Details'));
+ assert.ok(details.children.some(e=>/Google receives/.test(e.textContent||'')));
+ const css=readFileSync(new URL('../css/analytics-consent.css',import.meta.url),'utf8');
+ assert.match(css,/position:\s*fixed/);assert.match(css,/bottom:/);assert.match(css,/flex-wrap:\s*wrap/);
+});
+
+test('concurrent regional starts share one lookup and one controller',async()=>{
+ const f=fixture();let release,calls=0;f.win.fetch=()=>{calls++;return new Promise(r=>release=r);};
+ const first=regionalModule.startRegionalAnalytics(f.win,activeConfig());
+ const second=regionalModule.startRegionalAnalytics(f.win,activeConfig());
+ assert.equal(first,second);assert.equal(calls,1);
+ release({ok:true,json:async()=>({mode:'automatic'})});
+ assert.equal(await first,await second);assert.equal(f.scripts().length,1);
+});
+test('late consent-region response after unknown timeout cannot start a second controller',async()=>{
+ const f=fixture();let release;f.win.fetch=()=>new Promise(r=>release=r);
+ const pending=regionalModule.startRegionalAnalytics(f.win,activeConfig());f.advance(1600);
+ const controller=await pending;assert.equal(controller.choice(),'automatic');assert.equal(f.scripts().length,1);
+ release({ok:true,json:async()=>({mode:'consent'})});await new Promise(r=>setImmediate(r));
+ assert.equal(controller.choice(),'automatic');assert.equal(f.scripts().length,1);
+ assert.equal(f.elements.filter(e=>e.id==='casa-analytics-notice').length,1);
 });
