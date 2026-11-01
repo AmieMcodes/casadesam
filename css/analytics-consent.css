@@ -1,18 +1,35 @@
-/* In-flow notice: no overlay, chat obstruction, or motion. */
+/* Compact first layer; full explanation is an accessible native disclosure. */
 .casa-analytics-notice {
+  position: fixed;
+  z-index: 60;
+  inset-inline: 12px;
+  bottom: 12px;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: min(1100px, calc(100% - 24px));
+  margin-inline: auto;
+  max-height: max(100px, calc(100dvh - 180px));
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 8px 14px;
   background: #edf2e9;
-  border-bottom: 1px solid var(--sam-olive, #4f6f52);
-  color: var(--sam-ink, #1f2328);
-  padding: 24px max(20px, calc((100% - 960px) / 2));
-  font-size: 1rem;
+  color: #1f2328;
+  border: 1px solid #4f6f52;
+  border-radius: 12px;
+  box-shadow: 0 4px 22px #1f232825;
+  font-size: .875rem;
+  line-height: 1.45;
 }
 .casa-analytics-notice[hidden] { display: none; }
-.casa-analytics-notice h2 { margin: 0 0 12px; font-size: 1.25rem; color: #244844; }
-.casa-analytics-notice p { margin: 0 0 14px; max-width: 960px; }
-.casa-analytics-status { font-size: .9rem; }
-.casa-analytics-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.casa-analytics-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.casa-analytics-notice p { margin: 0; max-width: none; }
+.casa-analytics-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .casa-analytics-actions button,
-.casa-analytics-settings {
+.casa-analytics-settings,
+.casa-analytics-details > summary {
   font: inherit;
   cursor: pointer;
   color: #244844;
@@ -20,15 +37,34 @@
   border: 1px solid #4f6f52;
   border-radius: 8px;
   min-height: 44px;
-  padding: 9px 16px;
+  box-sizing: border-box;
+  padding: 10px 12px;
 }
+.casa-analytics-actions button[hidden] { display: none; }
 .casa-analytics-actions button:hover,
-.casa-analytics-settings:hover { background: #e1ebdc; }
-.casa-analytics-actions button:focus-visible,
-.casa-analytics-settings:focus-visible,
-.casa-analytics-notice h2:focus-visible { outline: 3px solid #244844; outline-offset: 3px; }
+.casa-analytics-settings:hover,
+.casa-analytics-details > summary:hover { background: #e1ebdc; }
+.casa-analytics-notice :focus-visible,
+.casa-analytics-settings:focus-visible { outline: 3px solid #244844; outline-offset: 3px; }
 .casa-analytics-actions button:disabled { opacity: .65; cursor: not-allowed; }
 .casa-analytics-settings { margin-top: 12px; }
+.casa-analytics-details { min-width: 0; }
+.casa-analytics-details[open] { flex-basis: 100%; max-height: 40dvh; overflow: auto; }
+.casa-analytics-details[open] > summary { width: fit-content; margin-bottom: 10px; }
+.casa-analytics-details[open] p + p { margin-top: 10px; }
 .casa-analytics-information { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .casa-analytics-information a { color: #244844; text-underline-offset: 3px; }
-.casa-analytics-information a:focus-visible { outline: 3px solid #244844; outline-offset: 3px; }
+body:has(.casa-analytics-notice:not([hidden])) { padding-bottom: var(--casa-analytics-height, 100px); }
+body:has(.casa-analytics-notice:not([hidden])) .gustavo { bottom: calc(var(--casa-analytics-height, 100px) + 12px); }
+body:has(.casa-analytics-notice:not([hidden])) .gustavo-panel { max-height: calc(100dvh - var(--casa-analytics-height, 100px) - 100px); }
+@media (max-width: 600px) {
+  .casa-analytics-notice { inset-inline: 8px; bottom: 8px; max-width: calc(100% - 16px); padding: 10px; gap: 8px; }
+  .casa-analytics-summary { flex-basis: 100%; }
+  .casa-analytics-actions { flex: 1 1 auto; }
+}
+@media (max-width: 520px) {
+  body:has(.casa-analytics-notice:not([hidden])) .gustavo-panel {
+    height: calc(100dvh - var(--casa-analytics-height, 100px) - 24px);
+    max-height: calc(100dvh - var(--casa-analytics-height, 100px) - 24px);
+  }
+}

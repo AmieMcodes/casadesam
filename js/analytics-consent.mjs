@@ -4,9 +4,48 @@ const STORAGE_KEY = 'casa-analytics-consent-v1';
 const LIFETIME = 90 * 24 * 60 * 60 * 1000;
 const MAX_TIMEOUT = 2147483647;
 const controllers = new WeakMap();
+const regionalStarts = new WeakMap();
+
+function eligible(win, config) {
+  const { location } = win;
+  if (!config.enabled || !/^G-[A-Z0-9]+$/.test(config.measurementId) ||
+      location.protocol !== 'https:' || location.hostname !== 'casadesam.org') return false;
+  const path = location.pathname === '/' ? '/index.html' : location.pathname;
+  return Object.hasOwn(config.pages, path.endsWith('.html') ? path : `${path}.html`);
+}
+
+// Resolve only the trusted same-origin edge policy, before inserting any Google tag.
+export function startRegionalAnalytics(win, config = analyticsConfig) {
+  if (!eligible(win, config)) return Promise.resolve(null);
+  if (regionalStarts.has(win)) return regionalStarts.get(win);
+  const pending = (async () => {
+    const abort = new AbortController();
+    let timer;
+    const timeout = new Promise(resolve => {
+      timer = win.setTimeout(() => resolve('automatic'), 1500);
+    });
+    const lookup = (async () => {
+      try {
+        const response = await win.fetch('/analytics-region', {
+          cache: 'no-store', credentials: 'same-origin', redirect: 'error', signal: abort.signal
+        });
+        if (!response.ok) return 'automatic';
+        const policy = await response.json();
+        return policy?.mode === 'consent' ? 'consent' : 'automatic';
+      } catch { return 'automatic'; }
+    })();
+    // Unknown, malformed, network failure and timeout intentionally default ON.
+    const mode = await Promise.race([lookup, timeout]);
+    win.clearTimeout(timer);
+    abort.abort();
+    return startAnalytics(win, config, mode);
+  })();
+  regionalStarts.set(win, pending);
+  return pending;
+}
 
 // This is intentionally not a general-purpose event API. No DOM/input data is read.
-export function startAnalytics(win, config = analyticsConfig) {
+export function startAnalytics(win, config = analyticsConfig, mode = 'consent') {
   const { location, document: doc } = win;
   if (!config.enabled || !/^G-[A-Z0-9]+$/.test(config.measurementId) ||
       location.protocol !== 'https:' || location.hostname !== 'casadesam.org') return null;
@@ -95,6 +134,7 @@ export function startAnalytics(win, config = analyticsConfig) {
     timer = win.setTimeout(scheduleExpiry, Math.min(remaining, MAX_TIMEOUT));
   }
   function granted() {
+    if (current.choice === 'automatic') return true;
     if (current.choice !== 'granted') return false;
     if (current.expiresAt <= win.Date.now()) { disable(); return false; }
     return true;
@@ -139,7 +179,7 @@ export function startAnalytics(win, config = analyticsConfig) {
   const controller = {
     accept() {
       if (failed) return; // No automatic retry loop if blocked/offline.
-      if (granted()) return;
+      if (current.choice === 'granted' && granted()) return;
       remember('granted'); enable(); render();
     },
     reject() {
@@ -149,7 +189,7 @@ export function startAnalytics(win, config = analyticsConfig) {
     choice() { return current.choice; }
   };
   controllers.set(win, controller);
-  current = savedChoice() || current;
+  current = savedChoice() || (mode === 'automatic' ? { choice: 'automatic', expiresAt: 0 } : current);
 
   const stylesheet = doc.createElement('link');
   stylesheet.rel = 'stylesheet';
@@ -163,9 +203,17 @@ export function startAnalytics(win, config = analyticsConfig) {
   const heading = doc.createElement('h2');
   heading.id = 'casa-analytics-heading';
   heading.tabIndex = -1;
-  heading.textContent = 'Optional traffic statistics';
+  heading.textContent = 'Analytics preferences';
+  heading.className = 'casa-analytics-heading';
+  const summary = doc.createElement('p');
+  summary.className = 'casa-analytics-summary';
+  summary.textContent = 'Allow Google Analytics cookies for visit statistics?';
+  const details = doc.createElement('details');
+  details.className = 'casa-analytics-details';
+  const detailsLabel = doc.createElement('summary');
+  detailsLabel.textContent = 'Details';
   const explanation = doc.createElement('p');
-  explanation.textContent = 'May we use Google Analytics to understand visits to our public pages? It uses analytics cookies after you accept. Google receives basic browser, device and page-usage data. We do not send your Gustavo messages or form entries. Advertising features are off. Your choice is optional, and you can change it in Analytics settings.';
+  explanation.textContent = 'Google Analytics helps us understand visits to our public pages. In the EEA, UK and Switzerland, analytics cookies are used after you accept. Elsewhere, including when your location cannot be determined, analytics starts automatically unless you have rejected it. Google receives basic browser, device and page-usage data. We do not send your Gustavo messages or form entries. Advertising features are off. Your choice is optional, and you can change it in Analytics settings.';
   const information = doc.createElement('p');
   const privacyLink = doc.createElement('a');
   privacyLink.href = 'https://policies.google.com/technologies/partner-sites';
@@ -198,7 +246,9 @@ export function startAnalytics(win, config = analyticsConfig) {
   const settings = button('Analytics settings', () => {
     notice.hidden = false;
     settings.setAttribute('aria-expanded', 'true');
+    details.open = true;
     heading.focus();
+    updateClearance();
   });
   settings.className = 'casa-analytics-settings';
   settings.setAttribute('aria-controls', notice.id);
@@ -206,19 +256,31 @@ export function startAnalytics(win, config = analyticsConfig) {
     notice.hidden = true;
     settings.setAttribute('aria-expanded', 'false');
     settings.focus();
+    updateClearance();
   });
   actions.append(accept, reject, close);
-  notice.append(heading, explanation, information, status, actions);
+  details.append(detailsLabel, explanation, information, status);
+  notice.append(heading, summary, actions, details);
   doc.body.insertBefore(notice, doc.body.children[0] || null);
   (doc.querySelector('.sam-footer') || doc.body).append(settings);
+  function updateClearance() {
+    // Reserve room for both the page footer and Gustavo, including expanded details.
+    const height = notice.hidden ? 0 : Math.ceil(notice.getBoundingClientRect?.().height || 0) + 24;
+    doc.body.style?.setProperty?.('--casa-analytics-height', `${height}px`);
+  }
+  if (win.ResizeObserver) new win.ResizeObserver(updateClearance).observe(notice);
+  details.addEventListener('toggle', updateClearance);
   render = () => {
     notice.hidden = current.choice !== 'unknown' && !sessionOnly;
+    summary.textContent = current.choice === 'automatic' ? 'Google Analytics is on. You can turn it off.' : 'Allow Google Analytics cookies for visit statistics?';
+    if (sessionOnly) details.open = true;
     close.hidden = current.choice === 'unknown';
     accept.disabled = failed;
-    reject.textContent = current.choice === 'granted' ? 'Turn analytics off' : 'Reject analytics';
+    reject.textContent = ['granted', 'automatic'].includes(current.choice) ? 'Turn analytics off' : 'Reject analytics';
     settings.setAttribute('aria-expanded', String(!notice.hidden));
-    status.textContent = failed ? 'Analytics could not load and remains off. You can try again on another page.' :
-      `Analytics is ${current.choice === 'granted' ? 'on' : 'off'}. ${sessionOnly ? 'Your browser could not save this choice; it applies only to this page. An earlier saved choice may return on another page. Clear the saved data for this site in your browser to remove it.' : 'We remember your choice for up to 90 days.'}`;
+    status.textContent = failed ? 'Analytics could not load and remains off. To retry, open Analytics settings on another page and accept.' :
+      `Analytics is ${['granted', 'automatic'].includes(current.choice) ? 'on' : 'off'}. ${sessionOnly ? 'Your browser could not save this choice; it applies only to this page. An earlier saved choice may return on another page. Clear the saved data for this site in your browser to remove it.' : current.choice === 'automatic' ? 'Enabled by regional policy, including unknown locations. This is not a saved consent choice.' : 'We remember your choice for up to 90 days.'}`;
+    updateClearance();
   };
   render();
   // React to rejection/deletion in other tabs, never treat an incoming grant as a click here.
@@ -226,15 +288,17 @@ export function startAnalytics(win, config = analyticsConfig) {
     if (current.choice === 'granted' && !granted()) return;
     if (sessionOnly) return;
     const saved = savedChoice();
-    if (!saved || saved.choice !== 'granted') disable(saved);
+    if (current.choice === 'automatic') {
+      if (saved?.choice === 'denied') disable(saved);
+    } else if (!saved || saved.choice !== 'granted') disable(saved);
   }
   win.addEventListener('storage', event => {
     if (event.key === STORAGE_KEY || event.key === null) recheck();
   });
   win.addEventListener('pageshow', recheck);
-  if (current.choice === 'granted') enable();
+  if (['granted', 'automatic'].includes(current.choice)) enable();
   else clearCookies();
   return controller;
 }
 
-if (typeof window !== 'undefined') startAnalytics(window);
+if (typeof window !== 'undefined') startRegionalAnalytics(window);
