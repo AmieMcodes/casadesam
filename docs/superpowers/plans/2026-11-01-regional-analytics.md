@@ -18,10 +18,10 @@ No new paid service, IP logging, client-supplied geography, advertising, chat/fo
 - Country responses must never be reused across visitors by caches.
 
 ## Tasks
-- [ ] Add failing endpoint tests for EEA/UK/CH/other/unknown and spoofed input, no-store headers.
-- [ ] Implement edge endpoint and run tests.
-- [ ] Add failing regional initialization/controller tests for ordering, error/timeout, saved No, automatic revocation, deep routes.
-- [ ] Implement region resolver/bootstrap and automatic state; run full suite.
-- [ ] Add UI contract tests, compact accessible notice/details CSS and collision handling; verify available browser route.
-- [ ] Update privacy explanation, documented risk and verification limits; full tests and independent review.
-- [ ] Confirm publication direction; verify exact deployment if authorized.
+- [x] Add failing endpoint tests for EEA/UK/CH/other/unknown and spoofed input, no-store headers.
+- [x] Implement edge endpoint and run tests.
+- [x] Add failing regional initialization/controller tests for ordering, error/timeout, saved No, automatic revocation, deep routes.
+- [x] Implement region resolver/bootstrap and automatic state; run full suite.
+- [x] Add UI contract tests, compact accessible notice/details CSS and collision handling; verify available browser route.
+- [x] Update privacy explanation, documented risk and verification limits; full tests and independent review.
+- [ ] Verify exact production deployment after authorized merge.
