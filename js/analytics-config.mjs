@@ -4,6 +4,18 @@ export const analyticsConfig = {
   enabled: true,
   measurementId: 'G-GYF79S5CW7',
   pages: {
+    "/blog/preventing-elopement-in-homes-for-autistic-adults.html": {
+      "path": "/blog/preventing-elopement-in-homes-for-autistic-adults.html",
+      "title": "Preventing Elopement in Homes for Autistic Adults | Casa de SAM Blog"
+    },
+    "/blog/what-residential-caregivers-need-to-know-about-autism-and-safety.html": {
+      "path": "/blog/what-residential-caregivers-need-to-know-about-autism-and-safety.html",
+      "title": "What Residential Caregivers Need to Understand About Autism and Safety | Casa de SAM Blog"
+    },
+    "/blog/creating-safety-plans-without-locking-down-the-home.html": {
+      "path": "/blog/creating-safety-plans-without-locking-down-the-home.html",
+      "title": "Creating Safety Plans Without Turning a Home Into a Locked Facility | Casa de SAM Blog"
+    },
     "/index.html": {
       "path": "/",
       "title": "Casa de SAM"
