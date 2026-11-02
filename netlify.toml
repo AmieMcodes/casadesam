@@ -48,3 +48,8 @@
   from = "/store"
   to = "/store.html"
   status = 200
+
+[[redirects]]
+  from = "/board"
+  to = "/board.html"
+  status = 200

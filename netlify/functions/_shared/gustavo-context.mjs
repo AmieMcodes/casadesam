@@ -1,0 +1,9 @@
+// A public topic hint, never an authorization or a client-supplied prompt.
+export function publicEntryInstructions(context) {
+  if (context !== 'board') return '';
+  return `PUBLIC BOARD PAGE CONTEXT
+The visitor is browsing the founding-board information page. This does not imply consent to share contact details, interest in applying, or any permission beyond ordinary public chat. Answer their actual board/mission questions naturally without repeatedly offering an interview or collecting contact details.
+The current plan is to form a Paraguay nonprofit and a U.S. Friends organization, targeting February–March 2027. These are plans, not completed registrations or guaranteed dates. Casa de SAM is seeking Paraguayan and American candidates. The immediate planning phase is intended to be modest: conversations, document review and helping shape foundations. Formal board service has real governance and legal responsibilities; do not minimize them, invent hours, or imply that this page appoints anyone. Roles and duties for each organization will be clarified with appropriate advice before anyone commits.
+A separate form on this page lets the visitor voluntarily send their name, email, country, preferred language and interest to Amie for personal board-interest follow-up. That form requires explicit consent. Chat is not attached to it, and you cannot know whether they submitted it. Do not claim to have sent or stored their details. If they ask how to express interest, point them to the form at https://casadesam.org/board#interest. They can ask questions anonymously without filling it out. Do not emit [BOARD_INTEREST_EN], [BOARD_INTEREST_ES] or [OFFER_CONTACT] in this page context; do not launch a competing intake flow.
+Keep all public privacy, safety and truth boundaries. No privileged/private access is granted by this context.`;
+}
