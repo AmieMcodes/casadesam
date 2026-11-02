@@ -1,10 +1,13 @@
 (() => {
   const endpoint = "/api/gustavo";
   const history = [];
+  const boardPage = document.body.dataset.gustavoContext === "board";
+  let asking = false;
+  let returnFocus;
   const root = document.createElement("div");
   root.className = "gustavo";
   root.innerHTML = `
-    <button class="gustavo-launch" type="button" aria-expanded="false" aria-controls="gustavo-panel">
+    <button class="gustavo-launch" aria-label="Ask Gustavo" type="button" aria-expanded="false" aria-controls="gustavo-panel">
       <span aria-hidden="true">G</span><span>Ask Gustavo</span>
     </button>
     <section class="gustavo-panel" id="gustavo-panel" aria-label="Ask Gustavo about Casa de SAM" hidden>
@@ -72,17 +75,48 @@
   window.addEventListener("resize", fitPanelToVisibleViewport);
   input.addEventListener("focus", () => requestAnimationFrame(fitPanelToVisibleViewport));
 
+  function pageLanguage() { return document.documentElement.lang === "es" ? "es" : "en"; }
+  function boardLabels() {
+    if (!boardPage) return;
+    const es = pageLanguage() === "es";
+    launch.setAttribute("aria-label", es ? "Preguntale a Gus" : "Ask Gus");
+    launch.lastElementChild.textContent = es ? "Preguntale a Gus" : "Ask Gus";
+    root.querySelector(".gustavo-header strong").textContent = es ? "Gus · Consejo Directivo" : "Gus · Board questions";
+    root.querySelector(".gustavo-header small").textContent = es ? "Guía de IA de Casa de SAM" : "Casa de SAM's AI guide";
+    panel.setAttribute("aria-label", es ? "Preguntas sobre el Consejo Directivo" : "Questions about board service");
+    close.setAttribute("aria-label", es ? "Cerrar la charla" : "Close chat");
+    chatForm.querySelector("label").textContent = es ? "Tu pregunta" : "Your question";
+    chatForm.querySelector("button").textContent = es ? "Enviar" : "Send";
+    input.placeholder = es ? "Preguntá sobre la misión o el Consejo Directivo…" : "Ask about the mission or board service…";
+    root.querySelector(".gustavo-note").textContent = es
+      ? "Soy una guía de IA. Podés preguntar sin dar tus datos de contacto. Esta charla no se adjunta al formulario. Las conversaciones pueden revisarse para mejorar Casa de SAM; no compartas datos privados innecesarios."
+      : "I’m an AI guide. You can ask without giving contact details. This chat is not attached to the form. Conversations may be reviewed to help Casa de SAM improve; please leave out unnecessary private information.";
+    // Translate the welcome, not the visitor's existing conversation.
+    messages.firstElementChild.textContent = es
+      ? "¡Hola! Soy Gus. Acá podés conocer la visión de Casa de SAM y lo que implicaría integrar su Consejo Directivo fundador. Podés hacer preguntas sin completar el formulario. ¿Qué te gustaría entender primero?"
+      : "Hi, I’m Gus. This is a place to explore Casa de SAM’s vision and what serving on its founding board could involve. You can ask questions without completing the form. What would you like to understand first?";
+  }
+  boardLabels();
+  window.addEventListener("casa:languagechange", boardLabels);
+  document.querySelectorAll("[data-gustavo-board-chat]").forEach(button => button.addEventListener("click", () => toggle(true)));
+
   function toggle(open) {
+    if (open && panel.hidden) returnFocus = document.activeElement;
+    if (open) boardLabels();
     panel.hidden = !open;
     launch.setAttribute("aria-expanded", String(open));
     if (open) {
       fitPanelToVisibleViewport();
       // Let mobile visitors read Gustavo's welcome before opening the keyboard.
       if (!mobileChat.matches) input.focus();
+      else close.focus({ preventScroll: true });
+    } else {
+      returnFocus?.focus();
     }
   }
   launch.addEventListener("click", () => toggle(panel.hidden));
   close.addEventListener("click", () => toggle(false));
+  root.addEventListener("keydown", event => { if (event.key === "Escape" && !panel.hidden) { event.preventDefault(); toggle(false); } });
 
   function cleanAnswer(text) {
     return text.replace(/\[OFFER_CONTACT\]/gi, "").replace(/\*\*(.*?)\*\*/g, "$1").replace(/^#{1,6}\s+/gm, "").trim();
@@ -108,18 +142,21 @@
     }).catch(() => {});
 
   async function ask(message) {
+    if (asking) return;
     await boardReady;
+    if (asking) return;
     if (board?.active) return board.handleMessage(message);
+    asking = true;
     addMessage(message, "question");
     input.value = "";
-    const waiting = addMessage("One moment…", "answer");
+    const waiting = addMessage(boardPage && pageLanguage() === "es" ? "Un momento…" : "One moment…", "answer");
     const sendButton = chatForm.querySelector("button");
     sendButton.disabled = true;
     try {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, history }),
+        body: JSON.stringify({ message, history, entryContext: boardPage ? "board" : undefined }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -137,13 +174,14 @@
       messages.scrollTop = messages.scrollHeight;
       history.push({ role: "user", content: message }, { role: "assistant", content: answer });
       history.splice(0, Math.max(0, history.length - 12));
-      if (data.boardInterest) board?.offer(data.boardLanguage);
-      else if (data.offerContact) handoff.hidden = false;
+      if (!boardPage && data.boardInterest) board?.offer(data.boardLanguage);
+      else if (!boardPage && data.offerContact) handoff.hidden = false;
     } catch {
-      waiting.textContent = "I’m not available just now. Please try again in a moment.";
+      waiting.textContent = boardPage && pageLanguage() === "es" ? "No estoy disponible en este momento. Podés volver a intentar en un momento." : "I’m not available just now. Please try again in a moment.";
     } finally {
+      asking = false;
       sendButton.disabled = false;
-      input.focus();
+      if (!panel.hidden) input.focus();
     }
   }
 

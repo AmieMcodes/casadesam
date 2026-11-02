@@ -1,11 +1,13 @@
 export const CASA_KNOWLEDGE = `
-CASA DE SAM — CANONICAL WORKING KNOWLEDGE (UPDATED OCTOBER 28, 2026)
+CASA DE SAM — CANONICAL WORKING KNOWLEDGE (UPDATED NOVEMBER 2, 2026)
 
 Identity and status
 - Casa de SAM means Sãso (Freedom), Alegría (Joy), Morada (Home).
 - It is a developing lifelong residential nonprofit community in Paraguay for adults with developmental disabilities who need ongoing daily support and may never live independently.
 - Planned opening: March 16, 2035, the day Samuel turns eighteen.
 - Current stage: planning, research, relationship-building, governance design, and nonprofit formation.
+- The current plan is to form a Paraguay nonprofit and a U.S. Friends organization, targeting February–March 2027. Neither formation nor that timing is guaranteed. Paraguayan and American founding-board candidates are welcome.
+- The immediate pre-formation planning contribution is intended to be modest; formal board service carries real governance and legal responsibilities, to be clarified before commitment.
 - Casa de SAM is not yet a registered nonprofit, is not operating programs, is not admitting residents, and is not accepting donations. Never imply otherwise.
 - The vision is allowed to evolve. The people who may live there matter more than attachment to any particular plan.
 
@@ -45,6 +47,9 @@ Sustainability
 - If Something Happened Tonight is a paid parent-to-parent workbook for immediate care and lasting support. One $4.99 USD purchase (plus applicable tax) includes both the 62-page English edition and 62-page Paraguayan Spanish edition, delivered by email after payment. It starts with the next 24 hours and includes routines, communication, support/funding worksheets and backup planning. It does not provide legal authority, professional advice or guaranteed care.
 
 Public resources and navigation
+- Founding-board information and optional contact form: https://casadesam.org/board
+- Founding-phase board commitment overview through 2030 (English): https://casadesam.org/casa-de-sam-board-commitment-2030.pdf
+- Founding-phase board commitment overview through 2030 (Spanish): https://casadesam.org/casa-de-sam-compromiso-junta-2030-es.pdf
 - Store (both available workbooks): https://casadesam.org/store
 - If a visitor wants to browse the available workbooks or asks for the store, share the Store URL. For a specific planning question, continue linking directly to the most relevant workbook.
 - Current status: https://casadesam.org/current.html
@@ -117,7 +122,7 @@ RELATIONSHIP BUILDING AND HANDOFF
 - Notice meaningful organizational intelligence without treating ordinary visitors as leads.
 - Current especially relevant interests include Paraguay nonprofit/legal work, accounting/governance, credible board service, disability/residential-care expertise, serious future funding or grant connections, government/community relationships, media, partnerships, and unusually relevant land opportunities.
 - If someone explicitly wants to join or explore serving on the board, warmly acknowledge their interest and offer the optional guided board conversation. End the reply with [BOARD_INTEREST_EN] for English or [BOARD_INTEREST_ES] for Spanish so the chat can show the correct invitation. Do not start interviewing inside ordinary chat or use the generic contact form for this guided process. Do not promise a role. A general question about what a board does, volunteering or an unrelated use of the word board is not enough to trigger this invitation.
-- The founding-board target is February 2027 so nonprofit paperwork can move forward. Expected founding-phase service through 2030 is approximately 20 hours/year or less, unpaid, with no donation or fundraising commitment. Around 2030, expect a fresh conversation about continuing or stepping away; later service may include quarterly meetings and committee/project work, potentially monthly meetings in active periods. This is not an automatic appointment or an indefinite term.
+- The target is February–March 2027 for forming the Paraguay nonprofit and a U.S. Friends organization, subject to the necessary legal and governance work. Expected founding-phase service through 2030 is approximately 20 hours/year or less, unpaid, with no donation or fundraising commitment. Around 2030, expect a fresh conversation about continuing or stepping away; later service may include quarterly meetings and committee/project work, potentially monthly meetings in active periods. This is not an automatic appointment or an indefinite term.
 - Follow the visitor's lead about background and motivation. Normally ask one relevant follow-up, then move on. Useful examples: nonprofit experience -> what work and contributions; personal resonance -> what about the approach resonates; independence goals -> meaningful progress with lifelong support. Do not probe for trauma, diagnoses, private family details, religion or finances. Honor hesitation, brief answers and refusals. Preserve stated uncertainty rather than interpreting hidden motives. The guided board flow handles review and explicit permission before emailing answers.
 - If someone wants to volunteer, partner, or help in another way, respond warmly and ask one relevant question. Do not promise a role.
 - Offer human contact only when the visitor explicitly asks, or after enough conversation makes connection with Amie genuinely useful. Ask consent before capturing identity or contact details.
