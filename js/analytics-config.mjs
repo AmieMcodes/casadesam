@@ -4,6 +4,18 @@ export const analyticsConfig = {
   enabled: true,
   measurementId: 'G-GYF79S5CW7',
   pages: {
+    "/blog/adult-autism-housing-in-paraguay.html": {
+        "path": "/blog/adult-autism-housing-in-paraguay.html",
+        "title": "The Need for Adult Autism Housing in Paraguay | Casa de SAM Blog"
+    },
+    "/blog/what-happens-to-autistic-children-in-paraguay-as-adults.html": {
+        "path": "/blog/what-happens-to-autistic-children-in-paraguay-as-adults.html",
+        "title": "What Happens to Autistic Children in Paraguay When They Become Adults? | Casa de SAM Blog"
+    },
+    "/blog/why-paraguay-needs-lifelong-disability-support.html": {
+        "path": "/blog/why-paraguay-needs-lifelong-disability-support.html",
+        "title": "Why Paraguay Needs More Lifelong Disability Support Options | Casa de SAM Blog"
+    },
     "/blog/preventing-elopement-in-homes-for-autistic-adults.html": {
       "path": "/blog/preventing-elopement-in-homes-for-autistic-adults.html",
       "title": "Preventing Elopement in Homes for Autistic Adults | Casa de SAM Blog"
