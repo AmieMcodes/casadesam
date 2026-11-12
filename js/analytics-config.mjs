@@ -4,6 +4,9 @@ export const analyticsConfig = {
   enabled: true,
   measurementId: 'G-GYF79S5CW7',
   pages: {
+"/blog/autism-services-in-paraguay-beyond-childhood.html": {"path": "/blog/autism-services-in-paraguay-beyond-childhood.html", "title": "Autism Services in Paraguay: What Families Need Beyond Childhood | Casa de SAM Blog"},
+"/blog/missing-middle-between-family-care-and-institutional-care.html": {"path": "/blog/missing-middle-between-family-care-and-institutional-care.html", "title": "The Missing Middle Between Family Care and Institutional Care | Casa de SAM Blog"},
+"/blog/building-a-better-future-for-adults-with-disabilities-in-paraguay.html": {"path": "/blog/building-a-better-future-for-adults-with-disabilities-in-paraguay.html", "title": "Building a Better Future for Adults With Disabilities in Paraguay | Casa de SAM Blog"},
     "/blog/adult-autism-housing-in-paraguay.html": {
         "path": "/blog/adult-autism-housing-in-paraguay.html",
         "title": "The Need for Adult Autism Housing in Paraguay | Casa de SAM Blog"
